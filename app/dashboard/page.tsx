@@ -1,18 +1,92 @@
+'use client'
+import { useState } from 'react'
+
 export default function Dashboard() {
+    const [selectedModule, setSelectedModule] = useState<any>(null)
     const topStats = [42, 61, 95, 27]
     const alerts = [82, 56, 73, 49]
 
-    const cards = [
-        'Command, Control and Data Center',
-        'Social Services Distribution Management System Service',
-        'Health Information Management System',
-        'City Development Dynamic GIS Mapping',
-        'Citizen Registration Management System',
-        'Business Permit License Office System',
-        'Real Property Tax and Assessment System',
-        'Procurement, Asset and Inventory Management System',
-        'Accounting and Finance Information Management System',
-        'Human Resource Information Management System',
+    const modules = [
+        {
+            id: 1,
+            title: 'Command, Control and Data Center',
+            links: [
+                { label: 'Open Dashboard', url: '#' },
+                { label: 'View Reports', url: '#' },
+            ],
+        },
+        {
+            id: 2,
+            title: 'Social Services Distribution Management System Service',
+            links: [
+                { label: 'Beneficiaries', url: '#' },
+                { label: 'Transactions', url: '#' },
+            ],
+        },
+        {
+            id: 3,
+            title: 'Health Information Management System',
+            links: [
+                { label: 'Patient Records', url: '#' },
+                { label: 'Health Monitoring', url: '#' },
+            ],
+        },
+        {
+            id: 4,
+            title: 'City Development Dynamic GIS Mapping',
+            links: [
+                { label: 'GIS Dashboard', url: '#' },
+                { label: 'City Mapping', url: '#' },
+            ],
+        },
+        {
+            id: 5,
+            title: 'Citizen Registration Management System',
+            links: [
+                { label: 'Citizen List', url: '#' },
+                { label: 'Verification', url: '#' },
+            ],
+        },
+        {
+            id: 6,
+            title: 'Business Permit License Office System',
+            links: [
+                { label: 'Permits', url: '#' },
+                { label: 'Applications', url: '#' },
+            ],
+        },
+        {
+            id: 7,
+            title: 'Real Property Tax and Assessment System',
+            links: [
+                { label: 'Tax Records', url: '#' },
+                { label: 'Assessments', url: '#' },
+            ],
+        },
+        {
+            id: 8,
+            title: 'Procurement, Asset and Inventory Management System',
+            links: [
+                { label: 'Inventory', url: '#' },
+                { label: 'Assets', url: '#' },
+            ],
+        },
+        {
+            id: 9,
+            title: 'Accounting and Finance Information Management System',
+            links: [
+                { label: 'Finance Dashboard', url: '#' },
+                { label: 'Reports', url: '#' },
+            ],
+        },
+        {
+            id: 10,
+            title: 'Human Resource Information Management System',
+            links: [
+                { label: 'Employees', url: '#' },
+                { label: 'Payroll', url: '#' },
+            ],
+        },
     ]
 
     const bars = [
@@ -151,14 +225,22 @@ export default function Dashboard() {
                             </div>
                         </div>
                         {/* SERVICE CARDS */}
-                        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-5">
-                            {cards.map((card, i) => (
-                                <div
-                                    key={i}
-                                    className="flex min-h-55 items-center justify-center rounded-md border border-[#33428f] bg-gradient-to-b from-[#412d8c] to-[#b6563d] p-4 text-center text-sm font-semibold leading-6"
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
+
+                            {modules.map((module) => (
+                                <button
+                                    key={module.id}
+                                    onClick={() => setSelectedModule(module)}
+                                    className="group relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-purple-700/70 to-orange-500/70 p-6 h-[220px] shadow-2xl hover:scale-[1.03] transition-all duration-300"
                                 >
-                                    {card}
-                                </div>
+                                    <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition"></div>
+
+                                    <div className="relative z-10 flex items-center justify-center h-full">
+                                        <h2 className="text-lg font-bold text-center leading-relaxed">
+                                            {module.title}
+                                        </h2>
+                                    </div>
+                                </button>
                             ))}
                         </div>
                     </div>
@@ -237,6 +319,54 @@ export default function Dashboard() {
                     </div>
                 </div>
             </div>
+
+            {/* MODAL */}
+            {selectedModule && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+
+                    <div className="w-full max-w-2xl rounded-3xl border border-white/10 bg-[#1b0f5c] p-8 shadow-2xl">
+
+                        <div className="flex items-start justify-between gap-4 mb-6">
+
+                            <div>
+                                <h2 className="text-2xl md:text-3xl font-bold">
+                                    {selectedModule.title}
+                                </h2>
+
+                                <p className="text-gray-300 mt-2">
+                                    Available Links & Resources
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={() => setSelectedModule(null)}
+                                className="w-10 h-10 rounded-full bg-white/10 hover:bg-red-500 transition"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <div className="space-y-4">
+
+                            {selectedModule.links.map((link: any, index: number) => (
+                                <a
+                                    key={index}
+                                    href={link.url}
+                                    className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-5 py-4 hover:bg-white/10 transition"
+                                >
+                                    <span className="font-medium">
+                                        {link.label}
+                                    </span>
+
+                                    <span className="text-cyan-300">
+                                        Open →
+                                    </span>
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
     )
 }
