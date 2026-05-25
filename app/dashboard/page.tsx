@@ -270,12 +270,12 @@ export default function Dashboard() {
                                         Smart City Monitoring
                                     </p>
 
-                                    <div className="relative mx-auto h-[205px] w-[205px]">
+                                    <div className="relative mx-auto h-[212px] w-[212px]">
 
                                         <Globe
                                             ref={globeRef}
-                                            width={205}
-                                            height={205}
+                                            width={212}
+                                            height={212}
                                             backgroundColor="rgba(0,0,0,0)"
                                             globeImageUrl="https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
                                             bumpImageUrl="https://unpkg.com/three-globe/example/img/earth-topology.png"
@@ -548,7 +548,7 @@ export default function Dashboard() {
                                 <div className="cyber-panel cyber-grid rounded-xl p-6">
 
                                     <p className="mb-6 text-center text-sm text-cyan-100/80">
-                                        System Efficiency
+                                        System Efficiency For Biñan Service Delivery
                                     </p>
 
                                     <div className="relative mx-auto flex h-[174px] w-[174px] items-center justify-center rounded-full border-[14px] border-cyan-400 border-r-blue-600 border-t-blue-600 border-b-cyan-400 shadow-[0_0_25px_rgba(34,211,238,.3)]">
@@ -569,7 +569,7 @@ export default function Dashboard() {
                                 <div className="cyber-panel cyber-grid rounded-xl p-4">
 
                                     <p className="mb-6 text-center text-sm text-cyan-100/80">
-                                        Monthly Activity
+                                        Monthly Activity SSDMS
                                     </p>
 
                                     <div className="space-y-3">
