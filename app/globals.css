@@ -59,6 +59,10 @@ body {
     0 0 25px rgba(59, 130, 246, .25);
 }
 
+#devtools-indicator {
+  display: none !important;
+}
+
 /* PIN ANIMATION */
 @keyframes pulsePin {
   0% {

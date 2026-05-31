@@ -30,6 +30,13 @@ export default function Dashboard() {
   const [selectedModule, setSelectedModule] = useState<any>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const [mounted, setMounted] =
+    useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
   const globeRef = useRef<any>(null)
 
   const [weather, setWeather] = useState({
@@ -222,8 +229,34 @@ export default function Dashboard() {
     { label: 'HRIMS', value: 91 },
   ]
 
+  const moduleColors = [
+    '#06b6d4',
+    '#3b82f6',
+    '#8b5cf6',
+    '#10b981',
+    '#f59e0b',
+    '#ef4444',
+    '#ec4899',
+    '#14b8a6',
+    '#84cc16',
+    '#f97316',
+  ]
+
+  const totalLinks = modules.reduce(
+    (sum, module) => sum + module.links.length,
+    0
+  )
+
+  const donutData = modules.map((module, index) => ({
+    ...module,
+    color: moduleColors[index % moduleColors.length],
+    value: module.links.length,
+    percent:
+      (module.links.length / totalLinks) * 100,
+  }))
+
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#020617] text-white">
+    <main className="relative h-full overflow-hidden bg-[#020617] text-white">
 
       {/* MOBILE TOGGLE */}
       <button
@@ -255,7 +288,7 @@ export default function Dashboard() {
           lg:left-[5px]
           lg:top-1/2
           lg:-translate-y-1/2
-          lg:h-[calc(100vh-10px)]
+          lg:h-[calc(100dvh-20px)]
           h-screen
 
           ${mobileMenuOpen
@@ -281,7 +314,8 @@ export default function Dashboard() {
             backdrop-blur-xl
             shadow-[0_0_30px_rgba(34,211,238,.15)]
             h-screen
-            lg:h-[calc(100vh-10px)]
+            lg:h-[calc(100vh-20px)]
+            2xl:h-auto
         ">
           {/* HEADER */}
           <div className="flex items-center border-b border-cyan-500/20 p-3 justify-center lg:justify-between">
@@ -419,12 +453,10 @@ export default function Dashboard() {
         <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,.05)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,.05)_1px,transparent_1px)] bg-[size:60px_60px]" />
       </div>
 
-      <div className="relative z-10 mx-auto p-2 lg:pl-[90px]">
-
-        <div className="grid grid-cols-1 gap-2 xl:grid-cols-12">
-
+      <div className="relative z-10 mx-auto p-2 lg:pl-[90px] h-auto">
+        <div className="grid h-full grid-cols-1 gap-2 xl:grid-cols-12">
           {/* LEFT + CENTER */}
-          <div className="space-y-2 xl:col-span-12">
+          <div className="flex h-full flex-col gap-2 xl:col-span-12">
 
             {/* HEADER */}
             <div className="cyber-panel cyber-grid relative overflow-hidden rounded-xl p-6">
@@ -442,10 +474,8 @@ export default function Dashboard() {
 
               <div className="relative z-10 flex flex-col gap-4 sm:flex-row items-center lg:items-start">
 
-                <div className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-cyan-400 bg-black/50 text-center text-xs font-bold text-cyan-300 shadow-[0_0_25px_rgba(34,211,238,.5)]">
-                  SMART
-                  <br />
-                  CITY
+                <div className="h-20 w-20">
+                  <img src="/smart-logo.png" alt="Logo" width={100} height={150} className="rounded-full" />
                 </div>
 
                 <div>
@@ -462,10 +492,9 @@ export default function Dashboard() {
             </div>
 
             {/* CONTENT */}
-            <div className="grid grid-cols-1 gap-2 lg:grid-cols-12">
-
+            <div className="grid flex-1 grid-cols-1 gap-2 lg:grid-cols-12 overflow-hidden">
               {/* LEFT */}
-              <div className="space-y-2 lg:col-span-2">
+              <div className="order-1 xl:order-1 lg:order-1 flex flex-col gap-2 lg:col-span-6 xl:col-span-3 2xl:col-span-3 h-full">
 
                 {/* GLOBE */}
                 <div className="cyber-panel cyber-grid rounded-xl p-4">
@@ -499,6 +528,188 @@ export default function Dashboard() {
                     />
                   </div>
                 </div>
+
+                {/* BAR CHART */}
+                <div className="cyber-panel cyber-grid rounded-xl p-4">
+
+                  <p className="mb-6 text-center text-sm text-cyan-100/80">
+                    Monthly Activity SSDMS
+                  </p>
+
+                  <div className="space-y-3">
+
+                    {bars.map((bar) => (
+                      <div
+                        key={bar.month}
+                        className="flex items-center gap-3"
+                      >
+
+                        <span className="w-10 text-sm text-cyan-100/70">
+                          {bar.month}
+                        </span>
+
+                        <div className="h-4 flex-1 overflow-hidden rounded bg-[#0d1438]">
+
+                          <div
+                            className="h-full rounded bg-gradient-to-r from-cyan-400 to-blue-600"
+                            style={{
+                              width: `${bar.value * 10}%`,
+                            }}
+                          />
+
+                        </div>
+
+                      </div>
+                    ))}
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              {/* CENTER */}
+              <div className="order-2 xl:order-2 lg:order-3 flex flex-col gap-2 lg:col-span-12 xl:col-span-6 2xl:col-span-6 h-full">
+
+                {/* FUTURISTIC WORLD MAP */}
+                <div className="cyber-panel cyber-grid relative rounded-xl p-4">
+
+                  {/* TOP */}
+                  <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+
+                    <div>
+                      <h2 className="cyber-title text-xl font-bold md:text-2xl">
+                        Global Smart City Monitoring
+                      </h2>
+
+                      <p className="text-sm text-cyan-200/70">
+                        Live Geographic Intelligence System
+                      </p>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <div className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-xs text-cyan-300">
+                        Biñan Laguna Active
+                      </div>
+
+                      <div className="rounded-full border border-lime-400/30 bg-lime-500/10 px-4 py-2 text-xs text-lime-300">
+                        Online
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* MAP */}
+                  <div className="relative flex-1 overflow-hidden rounded-xl border border-cyan-400/20 bg-[#050816] min-h-0 xl:h-[calc(87dvh-64px)] 2xl:h-[calc(79dvh-64px)] 3xl:h-[calc(61dvh-64px)]">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(14,165,233,0.08),transparent_70%)]" />
+
+                    <TransformWrapper
+                      initialScale={1.7}
+                      minScale={1}
+                      maxScale={8}
+                      wheel={{ disabled: true }}
+                      pinch={{ disabled: true }}
+                      doubleClick={{ disabled: true }}
+                      panning={{ disabled: true }}
+                    >
+                      {({ zoomIn, zoomOut, resetTransform }) => (
+                        <>
+                          {/* CONTROLS */}
+                          <div className="absolute right-4 top-4 z-50 flex flex-col gap-2">
+                            <button
+                              onClick={() => zoomIn()}
+                              className="h-10 w-10 rounded-lg border border-cyan-400/30 bg-[#081121]/80 text-cyan-300 backdrop-blur hover:bg-cyan-500/20"
+                            >
+                              +
+                            </button>
+
+                            <button
+                              onClick={() => zoomOut()}
+                              className="h-10 w-10 rounded-lg border border-cyan-400/30 bg-[#081121]/80 text-cyan-300 backdrop-blur hover:bg-cyan-500/20"
+                            >
+                              −
+                            </button>
+
+                            <button
+                              onClick={() => resetTransform()}
+                              className="rounded-lg border border-cyan-400/30 bg-[#081121]/80 px-3 py-2 text-xs text-cyan-300 backdrop-blur hover:bg-cyan-500/20"
+                            >
+                              RESET
+                            </button>
+                          </div>
+
+                          <TransformComponent
+                            wrapperClass="!w-full !h-full"
+                            contentClass="!w-full !h-full"
+                          >
+                            <ComposableMap
+                              projection="geoMercator"
+                              className="h-full w-full"
+                              projectionConfig={{
+                                scale: 160,
+                                center: [121.08, 14.33],
+                              }}
+                            >
+                              <Geographies geography="https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json">
+                                {({ geographies }: { geographies: any[] }) =>
+                                  geographies.map((geo: any) => (
+                                    <Geography
+                                      key={geo.rsmKey}
+                                      geography={geo}
+                                      fill="#0f2d52"
+                                      stroke="#38bdf8"
+                                      strokeWidth={0.4}
+                                      style={{
+                                        default: {
+                                          outline: 'none',
+                                        },
+                                        hover: {
+                                          fill: '#1d4ed8',
+                                          outline: 'none',
+                                        },
+                                        pressed: {
+                                          outline: 'none',
+                                        },
+                                      }}
+                                    />
+                                  ))
+                                }
+                              </Geographies>
+
+                              {/* PIN */}
+                              <Marker coordinates={[121.08, 14.33]}>
+                                <g className="pin-pulse">
+                                  <circle
+                                    r={8}
+                                    fill="#06b6d4"
+                                    stroke="#67e8f9"
+                                    strokeWidth={2}
+                                  />
+
+                                  <circle
+                                    r={18}
+                                    fill="rgba(34,211,238,.15)"
+                                  />
+
+                                  <text
+                                    textAnchor="middle"
+                                    y={-18}
+                                    className="fill-cyan-200 text-[12px] font-bold"
+                                  >
+                                    Biñan Laguna
+                                  </text>
+                                </g>
+                              </Marker>
+                            </ComposableMap>
+                          </TransformComponent>
+                        </>
+                      )}
+                    </TransformWrapper>
+                  </div>
+                </div>
+              </div>
+
+              {/* RIGHT SIDEBAR */}
+              <div className="order-3 xl:order-3 lg:order-2 flex flex-col gap-2 lg:col-span-6 xl:col-span-3 xl:justify-between 2xl:justify-start 2xl:col-span-3 h-full">
 
                 {/* WEATHER */}
                 <div className="cyber-panel cyber-grid rounded-xl p-4">
@@ -545,243 +756,186 @@ export default function Dashboard() {
                   </div>
                 </div>
 
+                {/* DONUT CHART */}
+                <div className="cyber-panel cyber-grid rounded-xl p-4 2xl:flex-none xl:flex-1">
+
+                  <p className="mb-4 text-center text-sm text-cyan-100/80">
+                    System Efficiency For Biñan Service Delivery
+                  </p>
+                  <div className="flex justify-center">
+                    <div className="relative w-full max-w-[430px]">
+                      {mounted && (
+                        <svg
+                          viewBox="0 0 430 430"
+                          className="w-full max-h-[383px] h-auto mx-auto"
+                        >
+
+                          {(() => {
+
+                            const radius = 105
+                            const cx = 215
+                            const cy = 215
+
+                            const circumference =
+                              2 * Math.PI * radius
+
+                            let offset = 0
+
+                            return donutData.map((item) => {
+
+                              const dash =
+                                (item.percent / 100) *
+                                circumference
+
+                              const startAngle =
+                                (offset / circumference) * 360
+
+                              const middleAngle =
+                                startAngle +
+                                (item.percent / 100) * 180
+
+                              const radians =
+                                (middleAngle - 90) *
+                                (Math.PI / 180)
+
+                              const x1 =
+                                cx + Math.cos(radians) * 100
+
+                              const y1 =
+                                cy + Math.sin(radians) * 100
+
+                              const x2 =
+                                cx + Math.cos(radians) * 130
+
+                              const y2 =
+                                cy + Math.sin(radians) * 130
+
+                              const x3 =
+                                x2 + (x2 > cx ? 45 : -45)
+
+                              const color = item.color
+
+                              const segment = (
+                                <g key={item.id}>
+
+                                  {/* SLICE */}
+                                  <circle
+                                    cx={cx}
+                                    cy={cy}
+                                    r={radius}
+                                    fill="none"
+                                    stroke={color}
+                                    strokeWidth="42"
+                                    strokeDasharray={`${dash} ${circumference}`}
+                                    strokeDashoffset={-offset}
+                                    transform={`rotate(-90 ${cx} ${cy})`}
+                                    strokeLinecap="butt"
+                                    className="
+                                    cursor-pointer
+                                    transition-all
+                                    duration-300
+                                    hover:opacity-80
+                                  "
+                                    onClick={() =>
+                                      setSelectedModule(item)
+                                    }
+                                  />
+
+                                  {/* CONNECTOR */}
+                                  <line
+                                    x1={x1}
+                                    y1={y1}
+                                    x2={x2}
+                                    y2={y2}
+                                    stroke={color}
+                                    strokeWidth="2"
+                                  />
+
+                                  <line
+                                    x1={x2}
+                                    y1={y2}
+                                    x2={x3}
+                                    y2={y2}
+                                    stroke={color}
+                                    strokeWidth="2"
+                                  />
+
+                                  {/* SHORT NAME */}
+                                  <text
+                                    x={
+                                      x3 > cx
+                                        ? x3 + 6
+                                        : x3 - 6
+                                    }
+                                    y={y2 + 3}
+                                    fill="white"
+                                    fontSize="11"
+                                    fontWeight="600"
+                                    textAnchor={
+                                      x3 > cx
+                                        ? 'start'
+                                        : 'end'
+                                    }
+                                    className="
+                                    cursor-pointer
+                                    select-none
+                                  "
+                                    onClick={() =>
+                                      setSelectedModule(item)
+                                    }
+                                  >
+                                    {item.short}
+                                  </text>
+
+                                  {/* PERCENT */}
+                                  <text
+                                    x={
+                                      x3 > cx
+                                        ? x3 + 6
+                                        : x3 - 6
+                                    }
+                                    y={y2 + 18}
+                                    fill="#94a3b8"
+                                    fontSize="9"
+                                    textAnchor={
+                                      x3 > cx
+                                        ? 'start'
+                                        : 'end'
+                                    }
+                                  >
+                                    {item.percent.toFixed(1)}%
+                                  </text>
+
+                                </g>
+                              )
+
+                              offset += dash
+
+                              return segment
+
+                            })
+
+                          })()}
+
+                        </svg>
+                      )}
+                    </div>
+
+                  </div>
+
+                </div>
+
                 {/* Mayors Weekly Reports */}
                 <div className="cyber-panel cyber-grid rounded-xl p-4">
 
-                  <p className="mb-4 text-center text-sm text-cyan-100/80">
+                  <p className="mb-6 text-center text-sm text-cyan-100/80">
                     Mayor's Weekly Reports
                   </p>
-
-                  <svg viewBox="0 0 300 120" className="h-[200px] w-full">
-
-                    <polyline
-                      fill="none"
-                      stroke="#84cc16"
-                      strokeWidth="4"
-                      points="10,80 80,40 150,50 220,20 290,30"
-                    />
-
-                    <polyline
-                      fill="none"
-                      stroke="#38bdf8"
-                      strokeWidth="4"
-                      points="10,50 80,30 150,30 220,60 290,90"
-                    />
-
-                    <polyline
-                      fill="none"
-                      stroke="#ef4444"
-                      strokeWidth="4"
-                      points="10,90 80,50 150,100 220,40 290,20"
-                    />
-                  </svg>
-                </div>
-              </div>
-
-              {/* CENTER */}
-              <div className="space-y-2 lg:col-span-7">
-
-                {/* FUTURISTIC WORLD MAP */}
-                <div className="cyber-panel cyber-grid relative rounded-xl p-4">
-
-                  {/* TOP */}
-                  <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-
-                    <div>
-                      <h2 className="cyber-title text-xl font-bold md:text-2xl">
-                        Global Smart City Monitoring
-                      </h2>
-
-                      <p className="text-sm text-cyan-200/70">
-                        Live Geographic Intelligence System
-                      </p>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <div className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-xs text-cyan-300">
-                        Biñan Laguna Active
-                      </div>
-
-                      <div className="rounded-full border border-lime-400/30 bg-lime-500/10 px-4 py-2 text-xs text-lime-300">
-                        Online
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* MAP */}
-                  <div className="relative h-[72vh] overflow-hidden rounded-xl border border-cyan-400/20 bg-[#050816]">
-
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(14,165,233,0.08),transparent_70%)]" />
-
-                    <TransformWrapper
-                      initialScale={1.7}
-                      minScale={1}
-                      maxScale={8}
-                    >
-                      {({
-                        zoomIn,
-                        zoomOut,
-                        resetTransform,
-                      }) => (
-                        <>
-                          {/* CONTROLS */}
-                          <div className="absolute right-4 top-4 z-50 flex flex-col gap-2">
-
-                            <button
-                              onClick={() => zoomIn()}
-                              className="h-10 w-10 rounded-lg border border-cyan-400/30 bg-[#081121]/80 text-cyan-300 backdrop-blur hover:bg-cyan-500/20"
-                            >
-                              +
-                            </button>
-
-                            <button
-                              onClick={() => zoomOut()}
-                              className="h-10 w-10 rounded-lg border border-cyan-400/30 bg-[#081121]/80 text-cyan-300 backdrop-blur hover:bg-cyan-500/20"
-                            >
-                              −
-                            </button>
-
-                            <button
-                              onClick={() => resetTransform()}
-                              className="rounded-lg border border-cyan-400/30 bg-[#081121]/80 px-3 py-2 text-xs text-cyan-300 backdrop-blur hover:bg-cyan-500/20"
-                            >
-                              RESET
-                            </button>
-                          </div>
-
-                          <TransformComponent
-                            wrapperClass="!w-full !h-full"
-                            contentClass="!w-full !h-full"
-                          >
-                            <ComposableMap
-                              projection="geoMercator"
-                              className="h-full w-full"
-                              projectionConfig={{
-                                scale: 160,
-                                center: [121.08, 14.33],
-                              }}
-                            >
-                              <ZoomableGroup>
-
-                                <Geographies geography="https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json">
-
-                                  {({ geographies }: { geographies: any[] }) =>
-                                    geographies.map((geo: any) => (
-                                      <Geography
-                                        key={geo.rsmKey}
-                                        geography={geo}
-                                        fill="#0f2d52"
-                                        stroke="#38bdf8"
-                                        strokeWidth={0.4}
-                                        style={{
-                                          default: {
-                                            outline: 'none',
-                                          },
-                                          hover: {
-                                            fill: '#1d4ed8',
-                                            outline: 'none',
-                                          },
-                                          pressed: {
-                                            outline: 'none',
-                                          },
-                                        }}
-                                      />
-                                    ))
-                                  }
-                                </Geographies>
-
-                                {/* PIN */}
-                                <Marker coordinates={[121.08, 14.33]}>
-
-                                  <g className="pin-pulse">
-
-                                    <circle
-                                      r={8}
-                                      fill="#06b6d4"
-                                      stroke="#67e8f9"
-                                      strokeWidth={2}
-                                    />
-
-                                    <circle
-                                      r={18}
-                                      fill="rgba(34,211,238,.15)"
-                                    />
-
-                                    <text
-                                      textAnchor="middle"
-                                      y={-18}
-                                      className="fill-cyan-200 text-[12px] font-bold"
-                                    >
-                                      Biñan Laguna
-                                    </text>
-                                  </g>
-                                </Marker>
-                              </ZoomableGroup>
-                            </ComposableMap>
-                          </TransformComponent>
-                        </>
-                      )}
-                    </TransformWrapper>
-                  </div>
-                </div>
-              </div>
-
-              {/* RIGHT SIDEBAR */}
-              <div className="space-y-2 xl:col-span-3">
-
-                {/* DONUT */}
-                <div className="cyber-panel cyber-grid rounded-xl p-6">
-
-                  <p className="mb-6 text-center text-sm text-cyan-100/80">
-                    System Efficiency For Biñan Service Delivery
-                  </p>
-
-                  <div className="relative mx-auto flex h-[206px] w-[206px] items-center justify-center rounded-full border-[14px] border-cyan-400 border-r-blue-600 border-t-blue-600 border-b-cyan-400 shadow-[0_0_25px_rgba(34,211,238,.3)]">
-
-                    <div className="text-center">
-                      <p className="text-4xl font-bold text-cyan-300">
-                        55%
-                      </p>
-
-                      <p className="text-sm text-cyan-100/70">
-                        Active
-                      </p>
-                    </div>
-                  </div>
+                  <button className="my-3 rounded-lg bg-cyan-500/10 px-4 py-2 text-cyan-100 hover:bg-cyan-500/20 block mx-auto">
+                    View Weekly Reports
+                  </button>
                 </div>
 
-                {/* BAR CHART */}
-                <div className="cyber-panel cyber-grid rounded-xl p-4">
-
-                  <p className="mb-6 text-center text-sm text-cyan-100/80">
-                    Monthly Activity SSDMS
-                  </p>
-
-                  <div className="space-y-3">
-
-                    {bars.map((bar) => (
-                      <div
-                        key={bar.month}
-                        className="flex items-center gap-3"
-                      >
-
-                        <span className="w-10 text-sm text-cyan-100/70">
-                          {bar.month}
-                        </span>
-
-                        <div className="h-4 flex-1 overflow-hidden rounded bg-[#0d1438]">
-
-                          <div
-                            className="h-full rounded bg-gradient-to-r from-cyan-400 to-blue-600"
-                            style={{
-                              width: `${bar.value * 10}%`,
-                            }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -797,9 +951,9 @@ export default function Dashboard() {
 
             <div className="cyber-panel cyber-grid w-full max-w-2xl rounded-3xl p-8 shadow-2xl">
 
-              <div className="mb-6 flex items-start justify-between gap-4">
+              <div className="mb-6 flex items-start justify-between gap-6">
 
-                <div>
+                <div className="w-[90%]">
                   <h2 className="text-2xl font-bold text-cyan-100 md:text-3xl">
                     {selectedModule.title}
                   </h2>
