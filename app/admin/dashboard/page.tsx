@@ -1,3 +1,26 @@
+'use client'
+
+import { redirect } from "next/navigation";
+import { useSession } from "next-auth/react";
+
+export default function AdminDashboardIndexPage() {
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    return <div>Loading...</div>;
+  }
+
+  if (status === "authenticated" && session?.user?.userType === 'ADMIN') {
+    return redirect("/admin/dashboard/users")
+  } else if (status === "authenticated" && session?.user?.userType === 'ENCODER') {
+    return redirect("/admin/dashboard/departments")
+  } else if (status === "authenticated" && session?.user?.userType === 'USER') {
+    return redirect("/dashboard")
+  } else  {
+    return redirect("/")
+  }
+}
+
 // "use client";
 
 // import { UserModel } from "@/app/generated/prisma/internal/prismaNamespaceBrowser";
@@ -299,25 +322,3 @@
 //   );
 // }
 
-'use client'
-
-import { redirect } from "next/navigation";
-import { useSession } from "next-auth/react";
-
-export default function AdminDashboardIndexPage() {
-  const { data: session, status } = useSession();
-
-  if (status === "loading") {
-    return <div>Loading...</div>;
-  }
-
-  if (status === "authenticated" && session?.user?.userType === 'ADMIN') {
-    return redirect("/admin/dashboard/users")
-  } else if (status === "authenticated" && session?.user?.userType === 'ENCODER') {
-    return redirect("/admin/dashboard/departments")
-  } else if (status === "authenticated" && session?.user?.userType === 'USER') {
-    return redirect("/dashboard")
-  } else  {
-    return redirect("/")
-  }
-}
