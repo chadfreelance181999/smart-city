@@ -361,27 +361,25 @@ export default function Dashboard() {
               px-4 py-4
               hover:bg-cyan-500/10"
           >
-            <Bell size={20} className="shrink-0 text-cyan-300" />
-
             {(sidebarOpen || mobileMenuOpen) && (
               <>
+                <Bell size={20} className="shrink-0 text-cyan-300" />
                 <span className="flex-1 text-left text-cyan-100">
                   Notifications
                 </span>
-
-                <span
-                  className="
+              </>
+            )}
+            <span
+              className="
                     rounded-full
                     bg-red-500
                     px-2 py-1
                     text-xs
                     text-white
                 "
-                >
-                  12
-                </span>
-              </>
-            )}
+            >
+              {totalLinks}
+            </span>
           </button>
 
           {/* MODULES */}
@@ -810,7 +808,7 @@ export default function Dashboard() {
                                     cy={cy}
                                     r={radius}
                                     fill="none"
-                                    stroke={color}
+                                    stroke={color || ''}
                                     strokeWidth="42"
                                     strokeDasharray={`${dash} ${circumference}`}
                                     strokeDashoffset={-offset}
@@ -831,7 +829,7 @@ export default function Dashboard() {
                                     y1={y1}
                                     x2={x2}
                                     y2={y2}
-                                    stroke={color}
+                                    stroke={color || ''}
                                     strokeWidth="2"
                                   />
 
@@ -840,7 +838,7 @@ export default function Dashboard() {
                                     y1={y2}
                                     x2={x3}
                                     y2={y2}
-                                    stroke={color}
+                                    stroke={color || ''}
                                     strokeWidth="2"
                                   />
 
