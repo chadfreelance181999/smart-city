@@ -83,7 +83,7 @@ export default function UserLoginPage() {
             </div>
 
             {/* Login Button */}
-            <button className="w-full py-4 rounded-xl bg-white font-semibold shadow-lg hover:scale-[1.02] hover:bg-gray-200 transition-all duration-300">
+            <button className="w-full py-4 rounded-xl bg-white text-black font-semibold shadow-lg hover:scale-[1.02] hover:bg-gray-200 transition-all duration-300">
               Login as User
             </button>
           </div>

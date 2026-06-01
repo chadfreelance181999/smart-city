@@ -10,13 +10,18 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     session: { strategy: 'jwt' },
     callbacks: {
         async jwt({ token, user }) {
-            if (user && (user as any).userType) token.userType = (user as any).userType
-            return token
+            if (user) {
+                // Attach raw backend token or user fields to the JWT payload
+                token.userType = user.userType;
+            }
+            return token;
         },
         async session({ session, token }) {
-            ;(session as any).user = (session as any).user || {}
-            ;(session as any).user.userType = token.userType ?? 'USER'
-            return session
+            if (token) {
+                // Inject the token into the session accessible by your app
+                session.user.userType = token.userType;
+            }
+            return session;
         }
     },
     providers: [Credentials({

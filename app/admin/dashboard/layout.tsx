@@ -158,8 +158,8 @@ export default function AdminLayout({
             </button>
 
             <button
-              key={"modules-link"}
-              onClick={() => redirect("/admin/dashboard/modules")}
+              key={"departments-link"}
+              onClick={() => redirect("/admin/dashboard/departments")}
               className="
                   flex w-full items-center gap-3
                   px-3 py-3
@@ -194,9 +194,8 @@ export default function AdminLayout({
         </div>
       </div>
 
-      <div className="relative z-10 lg:left-21">
-      {children}
-
+      <div className="relative z-10 lg:pl-[90px]">
+        {children}
       </div>
     </>
   );

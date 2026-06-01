@@ -17,11 +17,6 @@ enum UserType {
   ADMIN
 }
 
-model Role {
-  id        Int      @id @default(autoincrement())
-  name       String   @unique
-}
-
 model User {
   id         Int      @id @default(autoincrement())
   email      String   @unique
@@ -33,14 +28,35 @@ model User {
   createdAt  DateTime @default(now())
 }
 
-model AdminUser {
-  id         Int      @id @default(autoincrement())
-  email      String   @unique
-  firstName  String
-  lastName   String
-  middleName String?
-  password   String
-  createdAt  DateTime @default(now())
+model Departments {
+  id          Int     @id @default(autoincrement())
+  title       String  @unique
+  link        String
+  subTitle    String?
+  description String?
+  icon        String?
+
+  reports DepartmentReports[]
 }
 
+model DepartmentReports {
+  id           Int     @id @default(autoincrement())
+  departmentId Int
+  title        String
+  description  String?
 
+  createdAt  DateTime    @default(now())
+  department Departments @relation(fields: [departmentId], references: [id])
+  metrics ReportMetrics[]
+}
+
+model ReportMetrics {
+  id           Int     @id @default(autoincrement())
+  reportId     Int
+  name   String
+  value  Int
+  description String?
+
+  createdAt DateTime @default(now())
+  report DepartmentReports @relation(fields: [reportId], references: [id])
+}
