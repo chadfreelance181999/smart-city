@@ -36,7 +36,6 @@ export default function UserLoginPage() {
             await signIn("credentials", {
               email: email,
               password: password,
-              userType: "USER",
               redirectTo: "/dashboard",
             });
           }}
