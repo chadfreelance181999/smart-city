@@ -15,6 +15,7 @@ datasource db {
 enum UserType {
   USER
   ADMIN
+  ENCODER
 }
 
 model User {
@@ -35,6 +36,7 @@ model Departments {
   subTitle    String?
   description String?
   icon        String?
+  color       String?
 
   reports DepartmentReports[]
 }
@@ -43,20 +45,21 @@ model DepartmentReports {
   id           Int     @id @default(autoincrement())
   departmentId Int
   title        String
+  url          String?
   description  String?
 
-  createdAt  DateTime    @default(now())
-  department Departments @relation(fields: [departmentId], references: [id])
-  metrics ReportMetrics[]
+  createdAt  DateTime        @default(now())
+  department Departments     @relation(fields: [departmentId], references: [id])
+  metrics    ReportMetrics[]
 }
 
 model ReportMetrics {
-  id           Int     @id @default(autoincrement())
-  reportId     Int
-  name   String
-  value  Int
+  id          Int     @id @default(autoincrement())
+  reportId    Int
+  name        String
+  value       Int
   description String?
 
-  createdAt DateTime @default(now())
-  report DepartmentReports @relation(fields: [reportId], references: [id])
+  createdAt DateTime          @default(now())
+  report    DepartmentReports @relation(fields: [reportId], references: [id])
 }

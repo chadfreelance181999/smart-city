@@ -3,30 +3,27 @@
 import { redirect, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Menu,
-} from 'lucide-react'
+import { ChevronLeft, ChevronRight, Menu } from "lucide-react";
+import { signOut } from "next-auth/react";
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { data: session, status } = useSession();
-  const pathname = usePathname();
+  const { data: session, status } = useSession()
+  const pathname = usePathname()
 
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  const noAuth = ["/admin/login"].includes(pathname);
+  const noAuth = ["/admin/login"].includes(pathname)
 
   if (noAuth) {
-    return <>{children}</>;
+    return <>{children}</>
   }
 
-  if (status === "unauthenticated") redirect("/admin/login");
-  //   if ((session as any).user?.userType !== "ADMIN") redirect("/dashboard/login");
+  if (status === "unauthenticated") redirect("/admin/login")
+  if (session?.user?.userType === "ENCODER" && ['/admin/dashboard/users'].includes(pathname)) redirect("/admin/dashboard/departments")
 
   return (
     <>
@@ -42,7 +39,8 @@ export default function AdminLayout({
           text-cyan-300
           backdrop-blur-xl
           lg:hidden
-        ">
+        "
+      >
         {mobileMenuOpen ? (
           <span className="text-xl">✕</span>
         ) : (
@@ -123,19 +121,20 @@ export default function AdminLayout({
 
           {/* MODULES */}
           <div className="overflow-y-auto">
-            <button
-              key={"users-link"}
-              onClick={() => redirect("/admin/dashboard/users")}
-              className="
+            {session?.user?.userType === "ADMIN" && (
+              <button
+                key={"users-link"}
+                onClick={() => redirect("/admin/dashboard/users")}
+                className="
                   flex w-full items-center gap-3
                   px-3 py-3
                   transition-all
                   hover:bg-cyan-500/10
               "
-            >
-              {/* ICON */}
-              <div
-                className="
+              >
+                {/* ICON */}
+                <div
+                  className="
                     flex h-12 w-12 shrink-0
                     items-center justify-center
                     rounded-xl
@@ -143,19 +142,20 @@ export default function AdminLayout({
                     bg-cyan-500/10
                     text-2xl
                  "
-              >
-                👨🏻
-              </div>
-
-              {/* EXPANDED CONTENT */}
-              {(sidebarOpen || mobileMenuOpen) && (
-                <div className="flex flex-1 items-center justify-between">
-                  <div className="text-left">
-                    <p className="font-semibold text-cyan-100">Users</p>
-                  </div>
+                >
+                  👨🏻
                 </div>
-              )}
-            </button>
+
+                {/* EXPANDED CONTENT */}
+                {(sidebarOpen || mobileMenuOpen) && (
+                  <div className="flex flex-1 items-center justify-between">
+                    <div className="text-left">
+                      <p className="font-semibold text-cyan-100">Users</p>
+                    </div>
+                  </div>
+                )}
+              </button>
+            )}
 
             <button
               key={"departments-link"}
@@ -190,13 +190,79 @@ export default function AdminLayout({
                 </div>
               )}
             </button>
+
+            <button
+              key={"reports-link"}
+              onClick={() => redirect("/admin/dashboard/reports")}
+              className="
+                  flex w-full items-center gap-3
+                  px-3 py-3
+                  transition-all
+                  hover:bg-cyan-500/10
+              "
+            >
+              {/* ICON */}
+              <div
+                className="
+                    flex h-12 w-12 shrink-0
+                    items-center justify-center
+                    rounded-xl
+                    border border-cyan-400/20
+                    bg-cyan-500/10
+                    text-2xl
+                 "
+              >
+                📊
+              </div>
+
+              {/* EXPANDED CONTENT */}
+              {(sidebarOpen || mobileMenuOpen) && (
+                <div className="flex flex-1 items-center justify-between">
+                  <div className="text-left">
+                    <p className="font-semibold text-cyan-100">Reports</p>
+                  </div>
+                </div>
+              )}
+            </button>
+
+            <button
+              key={"logout-link"}
+              onClick={() => signOut({ callbackUrl: "/admin/login" })}
+              className="
+                  flex w-full items-center gap-3
+                  px-3 py-3 mt-auto
+                  transition-all
+                  hover:bg-cyan-500/10
+              "
+            >
+              {/* ICON */}
+              <div
+                className="
+                    flex h-12 w-12 shrink-0
+                    items-center justify-center
+                    rounded-xl
+                    border border-cyan-400/20
+                    bg-cyan-500/10
+                    text-2xl
+                 "
+              >
+                ⬅️
+              </div>
+
+              {/* EXPANDED CONTENT */}
+              {(sidebarOpen || mobileMenuOpen) && (
+                <div className="flex flex-1 items-center justify-between">
+                  <div className="text-left">
+                    <p className="font-semibold text-cyan-100">Logout</p>
+                  </div>
+                </div>
+              )}
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="relative z-10 lg:pl-[90px]">
-        {children}
-      </div>
+      <div className="relative z-10 lg:pl-[90px]">{children}</div>
     </>
   );
 }

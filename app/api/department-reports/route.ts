@@ -6,6 +6,10 @@ export const GET = async (request: Request) => {
   const departmentReports = await prisma.departmentReports.findMany({
     orderBy: {
       id: 'asc'
+    },
+    include: {
+      metrics: true,
+      department: true,
     }
   })
 
@@ -15,14 +19,14 @@ export const GET = async (request: Request) => {
 export const POST = async (request: Request) => {
   try {
     const body = await request.json()
-    const { title, description, metrics, departmentId } = body
+    const { title, description, url, metrics, departmentId } = body
 
     if (!title || !description) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 422 })
     }
 
     const department = await prisma.departmentReports.create({
-      data: { title, description, metrics: { create: metrics }, department: { connect: { id: departmentId } } },
+      data: { title, description, url, metrics: { createMany: { data: metrics } }, department: { connect: { id: departmentId } } },
     })
 
     return NextResponse.json(department, { status: 201 })

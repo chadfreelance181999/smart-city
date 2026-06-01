@@ -34,7 +34,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         async authorize(credentials, req) {
             if (credentials === null) return null
 
-            const user = await prisma.user.findFirst({ where: { email: credentials?.email as string ?? '', userType: credentials?.userType ?? 'USER' } })
+            const user = await prisma.user.findFirst({ where: { email: credentials?.email as string ?? '' } })
 
             if (!user) return null
 

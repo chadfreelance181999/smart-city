@@ -7,9 +7,9 @@ export const GET = async (
 ) => {
   const { id } = await params;
 
-  const department = await prisma.departments.findUnique({ where: { id: Number(id) } })
+  const department = await prisma.departmentReports.findUnique({ where: { id: Number(id) } })
 
-  if (!department) return NextResponse.json({ error: 'Department not found' }, { status: 404 })
+  if (!department) return NextResponse.json({ error: 'Report not found' }, { status: 404 })
 
   return NextResponse.json(department)
 }
@@ -21,11 +21,11 @@ export const PUT = async (
   try {
     const { id } = await params;
     const body = await request.json()
-    const { title, link, subTitle, description, icon, color } = body
+    const { title, url, description } = body
 
-    const department = await prisma.departments.update({
+    const department = await prisma.departmentReports.update({
       where: { id: Number(id) },
-      data: { title, link, subTitle, description, icon, color }
+      data: { title, url, description }
     })
 
     return NextResponse.json(department)
@@ -41,12 +41,13 @@ export const DELETE = async (
   try {
     const { id } = await params;
 
-    await prisma.departments.delete({
+    await prisma.departmentReports.delete({
       where: { id: Number(id) }
     });
 
-    return NextResponse.json({ message: 'Department deleted successfully' })
+    return NextResponse.json({ message: 'Report deleted successfully' })
   } catch (err: any) {
+    console.log(err)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
