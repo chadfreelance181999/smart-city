@@ -19,14 +19,14 @@ export const GET = async (request: Request) => {
 export const POST = async (request: Request) => {
   try {
     const body = await request.json()
-    const { title, link, subTitle, description, icon } = body
+    const { title, link, subTitle, description, icon, color } = body
 
     if (!title || !link) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 422 })
     }
 
     const department = await prisma.departments.create({
-      data: { title, link, subTitle, description, icon },
+      data: { title, link, subTitle, description, icon, color },
     })
 
     return NextResponse.json(department, { status: 201 })

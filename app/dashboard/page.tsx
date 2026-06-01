@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Bell, Menu } from "lucide-react";
+import { signOut } from "next-auth/react";
 
 import {
   ComposableMap,
@@ -40,10 +41,6 @@ export default function Dashboard() {
     low: "24°C",
     condition: "Partly Cloudy",
   });
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     const fetchWeather = async () => {
@@ -98,6 +95,7 @@ export default function Dashboard() {
       const res = await fetch("/api/departments");
       const departments = await res.json();
       setDepartments(departments);
+      setMounted(true);
     };
 
     void fetchDepartments();
@@ -247,16 +245,16 @@ export default function Dashboard() {
     "#f97316",
   ];
 
-  const totalLinks = modules.reduce(
-    (sum, module) => sum + module.links.length,
+  const totalLinks = departments.reduce(
+    (sum, department) => sum + department._count.reports,
     0,
   );
 
-  const donutData = modules.map((module, index) => ({
-    ...module,
-    color: moduleColors[index % moduleColors.length],
-    value: module.links.length,
-    percent: (module.links.length / totalLinks) * 100,
+  const donutData = departments.map((department, index) => ({
+    ...department,
+    color: department.color,
+    value: department._count.reports,
+    percent: (department._count.reports / totalLinks) * 100,
   }));
 
   return (
@@ -441,6 +439,40 @@ export default function Dashboard() {
                 )}
               </button>
             ))}
+
+            <button
+              key={"departments-link"}
+              onClick={() => signOut({ callbackUrl: "/dashboard/login" })}
+              className="
+                flex w-full items-center gap-3
+                px-3 py-3
+                transition-all
+                hover:bg-cyan-500/10
+              "
+            >
+              {/* ICON */}
+              <div
+                className="
+                  flex h-12 w-12 shrink-0
+                  items-center justify-center
+                  rounded-xl
+                  border border-cyan-400/20
+                  bg-cyan-500/10
+                  text-2xl
+                "
+              >
+                ⬅️
+              </div>
+
+              {/* EXPANDED CONTENT */}
+              {(sidebarOpen || mobileMenuOpen) && (
+                <div className="flex flex-1 items-center justify-between">
+                  <div className="text-left">
+                    <p className="font-semibold text-cyan-100">Logout</p>
+                  </div>
+                </div>
+              )}
+            </button>
           </div>
         </div>
       </div>
@@ -826,7 +858,7 @@ export default function Dashboard() {
                                   "
                                     onClick={() => setSelectedModule(item)}
                                   >
-                                    {item.short}
+                                    {item.subTitle}
                                   </text>
 
                                   {/* PERCENT */}

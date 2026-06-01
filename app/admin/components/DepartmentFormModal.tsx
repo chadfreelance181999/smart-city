@@ -24,6 +24,8 @@ export default function DepartmentFormModal({
       link: '',
       subTitle: '',
       description: '',
+      color: '',
+      icon: '',
   }), [])
 
   const isEditMode = !!initialData
@@ -122,6 +124,21 @@ export default function DepartmentFormModal({
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter department icon"
+            />
+          </div>
+
+           {/* Color */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Color
+            </label>
+            <input
+              type="color"
+              name="color"
+              value={formData.color ?? ''}
+              onChange={handleChange}
+              className="w-50 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter department color"
             />
           </div>
 
