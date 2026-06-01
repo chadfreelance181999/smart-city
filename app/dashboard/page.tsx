@@ -883,13 +883,13 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                {/* Mayors Weekly Reports */}
+                {/* Mayors Weekly Briefer */}
                 <div className="cyber-panel cyber-grid rounded-xl p-4">
                   <p className="mb-6 text-center text-sm text-cyan-100/80">
-                    Mayor's Weekly Reports
+                    Mayor's Weekly Briefer
                   </p>
                   <button className="my-3 rounded-lg bg-cyan-500/10 px-4 py-2 text-cyan-100 hover:bg-cyan-500/20 block mx-auto">
-                    View Weekly Reports
+                    View Weekly Briefer
                   </button>
                 </div>
               </div>
