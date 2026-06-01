@@ -810,7 +810,7 @@ export default function Dashboard() {
                                     cy={cy}
                                     r={radius}
                                     fill="none"
-                                    stroke={color}
+                                    // stroke={color}
                                     strokeWidth="42"
                                     strokeDasharray={`${dash} ${circumference}`}
                                     strokeDashoffset={-offset}
