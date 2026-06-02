@@ -6,8 +6,6 @@ import { ChevronLeft, ChevronRight, Bell, Menu } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { DepartmentsModel } from "../generated/prisma/models";
 
-import type { MapContainerProps } from "react-leaflet";
-
 const Globe = dynamic(() => import("react-globe.gl"), {
   ssr: false,
 });
@@ -18,11 +16,8 @@ interface DepartmentsModelWithCount extends DepartmentsModel {
   };
 }
 
-const MapContainer = dynamic<MapContainerProps>(
-  () =>
-    import("react-leaflet").then(
-      (mod) => mod.MapContainer
-    ),
+const MapContainer: any = dynamic(
+  () => import("react-leaflet").then((mod) => mod.MapContainer),
   {
     ssr: false,
   },
