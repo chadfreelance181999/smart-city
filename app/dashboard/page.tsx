@@ -46,6 +46,7 @@ export default function Dashboard() {
   const [selectedModule, setSelectedModule] =
     useState<DepartmentsWithReports | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeMap, setActiveMap] = useState<"cctv" | "hims">("cctv");
   const [leaflet, setLeaflet] = useState<any>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openWeeklyBriefer, setOpenWeeklyBriefer] = useState(false);
@@ -148,108 +149,6 @@ export default function Dashboard() {
     loadLeaflet();
   }, []);
 
-  const modules = [
-    {
-      id: 1,
-      title: "Command, Control and Data Center",
-      short: "CCDC",
-      icon: "🖥️",
-      links: [
-        { label: "Open Dashboard", url: "#" },
-        { label: "View Reports", url: "#" },
-      ],
-    },
-    {
-      id: 2,
-      title: "Social Services Distribution Management System Service",
-      short: "SSDMS",
-      icon: "🤝",
-      links: [
-        { label: "Beneficiaries", url: "#" },
-        { label: "Transactions", url: "#" },
-      ],
-    },
-    {
-      id: 3,
-      title: "Health Information Management System",
-      short: "HIMS",
-      icon: "🏥",
-      links: [
-        { label: "Patient Records", url: "#" },
-        { label: "Health Monitoring", url: "#" },
-      ],
-    },
-    {
-      id: 4,
-      title: "City Development Dynamic GIS Mapping",
-      short: "GIS",
-      icon: "🗺️",
-      links: [
-        { label: "GIS Dashboard", url: "#" },
-        { label: "City Mapping", url: "#" },
-      ],
-    },
-    {
-      id: 5,
-      title: "Citizen Registration Management System",
-      short: "CRMS",
-      icon: "🪪",
-      links: [
-        { label: "Citizen List", url: "#" },
-        { label: "Verification", url: "#" },
-      ],
-    },
-    {
-      id: 6,
-      title: "Business Permit License Office System",
-      short: "BPLO",
-      icon: "🏢",
-      links: [
-        { label: "Permits", url: "#" },
-        { label: "Applications", url: "#" },
-      ],
-    },
-    {
-      id: 7,
-      title: "Real Property Tax and Assessment System",
-      short: "RPTAS",
-      icon: "💰",
-      links: [
-        { label: "Tax Records", url: "#" },
-        { label: "Assessments", url: "#" },
-      ],
-    },
-    {
-      id: 8,
-      title: "Procurement, Asset and Inventory Management System",
-      short: "PAIMS",
-      icon: "📦",
-      links: [
-        { label: "Inventory", url: "#" },
-        { label: "Assets", url: "#" },
-      ],
-    },
-    {
-      id: 9,
-      title: "Accounting and Finance Information Management System",
-      short: "AFIMS",
-      icon: "📊",
-      links: [
-        { label: "Finance Dashboard", url: "#" },
-        { label: "Reports", url: "#" },
-      ],
-    },
-    {
-      id: 10,
-      title: "Human Resource Information Management System",
-      short: "HRIMS",
-      icon: "👨‍💼",
-      links: [
-        { label: "Employees", url: "#" },
-        { label: "Payroll", url: "#" },
-      ],
-    },
-  ];
 
   const bars = [
     { month: "Dec", value: 0 },
@@ -266,31 +165,6 @@ export default function Dashboard() {
     { month: "Jan", value: 100 },
   ];
 
-  const stats = [
-    { label: "CCDC", value: 42 },
-    { label: "SSDMS", value: 61 },
-    { label: "HIMS", value: 95 },
-    { label: "GIS", value: 27 },
-    { label: "CRMS", value: 82 },
-    { label: "BPLO", value: 56 },
-    { label: "RPTAS", value: 73 },
-    { label: "PAIMS", value: 49 },
-    { label: "AFIMS", value: 88 },
-    { label: "HRIMS", value: 91 },
-  ];
-
-  const moduleColors = [
-    "#06b6d4",
-    "#3b82f6",
-    "#8b5cf6",
-    "#10b981",
-    "#f59e0b",
-    "#ef4444",
-    "#ec4899",
-    "#14b8a6",
-    "#84cc16",
-    "#f97316",
-  ];
 
   const totalLinks = departments.reduce(
     (sum, department) => sum + department.reports.length,
@@ -380,285 +254,314 @@ export default function Dashboard() {
     });
   };
 
-  const weeklyBrieferData = [
+  const createHealthIcon = (barangay: string) => {
+    if (!leaflet) return null;
+
+    return new leaflet.DivIcon({
+      html: `
+      <div style="
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        gap:4px;
+      ">
+        <div style="
+          background:rgba(127,29,29,.95);
+          border:1px solid rgba(239,68,68,.8);
+          color:white;
+          padding:4px 8px;
+          border-radius:999px;
+          font-size:11px;
+          font-weight:600;
+          white-space:nowrap;
+        ">
+          ${barangay}
+        </div>
+
+        <div style="
+          width:38px;
+          height:38px;
+          border-radius:50%;
+          background:#7f1d1d;
+          border:2px solid #ef4444;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          font-size:18px;
+          box-shadow:0 0 20px rgba(239,68,68,.8);
+        ">
+          🏥
+        </div>
+      </div>
+    `,
+      className: "",
+      iconSize: [160, 60],
+      iconAnchor: [80, 50],
+    });
+  };
+
+  const barangays = [
     {
-      department: "CCDC (Command, Control and Data Center)",
-      reports: [
-        {
-          title: "City Systems Availability",
-          href: "https://docs.google.com/document/d/1zZswe33Dav0ecrqa2guDspnY1ku2hHpxrDRgoSUc8fU/edit?usp=sharing",
-          metrics: {
-            "Average Uptime": "99.8%",
-            "Lowest Monthly Uptime": "97.6%",
-            "Highest Monthly Uptime": "100%",
-            "Systems Monitored": "42",
-            "Active CCTV Cameras": "685",
-          },
-        },
-        {
-          title: "Emergency & Incident Response",
-          href: "#",
-          metrics: {
-            "Average Response Time": "3.8 mins",
-            "Fastest Response": "45 secs",
-            "Longest Response": "14 mins",
-            "Total Incidents Resolved": "1,245",
-            "Resolution Rate": "98%",
-          },
-        },
+      id: 1,
+      name: "Biñan (Poblacion)",
+      position: [14.3386, 121.0889],
+      illnesses: [
+        { name: "Dengue", infected: 46 },
+        { name: "Influenza", infected: 23 },
+        { name: "Hypertension", infected: 58 },
       ],
     },
 
     {
-      department: "SSDMS (Social Services Distribution Management System)",
-      reports: [
-        {
-          title: "Social Assistance Distribution",
-          href: "#",
-          metrics: {
-            "Beneficiaries Served": "14,250",
-            "Average Assistance Released": "₱4,200",
-            "Distribution Completion Rate": "97%",
-            "Barangays Completed": "24 / 24",
-            "Total Assistance Released": "₱59.8M",
-          },
-        },
-        {
-          title: "Assistance Application Processing",
-          href: "#",
-          metrics: {
-            "Average Processing Time": "2.8 days",
-            "Fastest Processing": "6 hours",
-            "Longest Processing": "9 days",
-            "Application Approval Rate": "94%",
-            "Applications Processed": "15,160",
-          },
-        },
+      id: 2,
+      name: "Bungahan",
+      position: [14.3500, 121.0970],
+      illnesses: [
+        { name: "Dengue", infected: 32 },
+        { name: "Influenza", infected: 18 },
+        { name: "Hypertension", infected: 40 },
       ],
     },
 
     {
-      department: "HIMS (Health Information Management System)",
-      reports: [
-        {
-          title: "Public Health Consultations",
-          href: "#",
-          metrics: {
-            "Average Daily Patients": "870",
-            "Lowest Daily Count": "420",
-            "Highest Daily Count": "1,340",
-            "Monthly Consultations": "26,100",
-            "Vaccination Coverage": "93%",
-          },
-        },
-        {
-          title: "Health Facility Utilization",
-          href: "#",
-          metrics: {
-            "Average Bed Occupancy": "82%",
-            "Lowest Occupancy": "58%",
-            "Highest Occupancy": "99%",
-            "Available Beds": "520",
-            "Emergency Response Rate": "96%",
-          },
-        },
+      id: 3,
+      name: "Canlalay",
+      position: [14.3165, 121.0845],
+      illnesses: [
+        { name: "Dengue", infected: 29 },
+        { name: "Diabetes", infected: 20 },
+        { name: "Influenza", infected: 17 },
       ],
     },
 
     {
-      department: "GIS (City Development Dynamic GIS Mapping)",
-      reports: [
-        {
-          title: "Barangay Mapping Coverage",
-          href: "#",
-          metrics: {
-            "Mapped Areas": "96%",
-            "Lowest Barangay Coverage": "78%",
-            "Highest Coverage": "100%",
-            "Roads Digitized": "1,280 km",
-            "Infrastructure Assets Tagged": "18,450",
-          },
-        },
-        {
-          title: "Land Use Distribution",
-          href: "#",
-          metrics: {
-            "Residential Areas": "48%",
-            "Industrial Areas": "27%",
-            "Commercial & Institutional Areas": "25%",
-            "Total Mapped Land Area": "4,350 hectares",
-            "Zoning Compliance Rate": "92%",
-          },
-        },
+      id: 4,
+      name: "Casile",
+      position: [14.255, 121.145],
+      illnesses: [
+        { name: "Dengue", infected: 11 },
+        { name: "Influenza", infected: 8 },
+        { name: "Hypertension", infected: 15 },
       ],
     },
 
     {
-      department: "CRMS (Citizen Registration Management System)",
-      reports: [
-        {
-          title: "Resident Registration Overview",
-          href: "#",
-          metrics: {
-            "Registered Residents": "312,450",
-            "Average Daily Registrations": "520",
-            "Peak Registrations": "1,120",
-            "Active Records": "98%",
-            "New Registrations This Year": "18,600",
-          },
-        },
-        {
-          title: "Population Demographics",
-          href: "#",
-          metrics: {
-            Male: "49.2%",
-            Female: "50.3%",
-            Others: "0.5%",
-            "Working Age Population": "64%",
-            "Senior Citizens": "9%",
-          },
-        },
+      id: 5,
+      name: "De La Paz",
+      position: [14.342, 121.074],
+      illnesses: [
+        { name: "Dengue", infected: 37 },
+        { name: "Diabetes", infected: 16 },
+        { name: "Hypertension", infected: 43 },
       ],
     },
 
     {
-      department: "BPLO (Business Permit License Office System)",
-      reports: [
-        {
-          title: "Business Permit Applications",
-          href: "#",
-          metrics: {
-            "Applications Received": "8,950",
-            "Approval Rate": "93%",
-            "Rejection Rate": "7%",
-            "New Businesses Registered": "1,850",
-            "Renewals Processed": "7,100",
-          },
-        },
-        {
-          title: "Permit Processing Performance",
-          href: "#",
-          metrics: {
-            "Average Processing Time": "1.9 days",
-            "Fastest Approval": "2 hours",
-            "Longest Approval": "8 days",
-            "Same-Day Approvals": "68%",
-            "Customer Satisfaction Rate": "96%",
-          },
-        },
+      id: 6,
+      name: "Ganado",
+      position: [14.318, 121.066],
+      illnesses: [
+        { name: "Dengue", infected: 18 },
+        { name: "Influenza", infected: 14 },
+        { name: "Hypertension", infected: 31 },
       ],
     },
 
     {
-      department: "RPTAS (Real Property Tax and Assessment System)",
-      reports: [
-        {
-          title: "Real Property Tax Collection",
-          href: "#",
-          metrics: {
-            "Total Collection": "₱485M",
-            "Collection Efficiency Rate": "89%",
-            "Highest Monthly Collection": "₱56M",
-            "Delinquency Rate": "11%",
-            "Collection Growth": "8.5%",
-          },
-        },
-        {
-          title: "Property Assessment Statistics",
-          href: "#",
-          metrics: {
-            "Assessed Properties": "84,600",
-            "Average Property Value": "₱2.9M",
-            "Highest Assessed Property": "₱180M",
-            "Newly Assessed Properties": "3,450",
-            "Assessment Completion Rate": "95%",
-          },
-        },
+      id: 7,
+      name: "Langkiwa",
+      position: [14.322, 121.105],
+      illnesses: [
+        { name: "Dengue", infected: 21 },
+        { name: "Diabetes", infected: 11 },
+        { name: "Influenza", infected: 10 },
       ],
     },
 
     {
-      department: "PAIMS (Procurement, Asset and Inventory Management System)",
-      reports: [
-        {
-          title: "Government Asset Inventory",
-          href: "#",
-          metrics: {
-            "Total Assets": "24,850",
-            "Available Assets": "92%",
-            "Assets Under Maintenance": "8%",
-            "Asset Utilization Rate": "88%",
-            "ICT Assets Recorded": "5,620",
-          },
-        },
-        {
-          title: "Procurement Cycle Monitoring",
-          href: "#",
-          metrics: {
-            "Completed Requests": "96%",
-            "Average Procurement Duration": "6 days",
-            "Longest Procurement Cycle": "24 days",
-            "Active Purchase Requests": "185",
-            "Procurement Savings": "₱12.5M",
-          },
-        },
+      id: 8,
+      name: "Loma",
+      position: [14.304, 121.089],
+      illnesses: [
+        { name: "Dengue", infected: 25 },
+        { name: "Influenza", infected: 19 },
+        { name: "Hypertension", infected: 34 },
       ],
     },
 
     {
-      department:
-        "AFIMS (Accounting and Finance Information Management System)",
-      reports: [
-        {
-          title: "City Revenue & Expenditure",
-          href: "#",
-          metrics: {
-            "Total Revenue": "₱3.25B",
-            "Total Expenditures": "₱2.91B",
-            "Net Surplus": "₱340M",
-            "Revenue Growth": "10.4%",
-            "Operating Margin": "10.5%",
-          },
-        },
-        {
-          title: "Budget Utilization",
-          href: "#",
-          metrics: {
-            "Average Budget Utilization": "86%",
-            "Lowest Utilization": "61%",
-            "Highest Utilization": "99%",
-            "Departments Within Budget": "92%",
-            "Remaining Budget": "₱450M",
-          },
-        },
+      id: 9,
+      name: "Malaban",
+      position: [14.292, 121.067],
+      illnesses: [
+        { name: "Dengue", infected: 27 },
+        { name: "Diabetes", infected: 12 },
+        { name: "Influenza", infected: 14 },
       ],
     },
 
     {
-      department: "HRIMS (Human Resource Information Management System)",
-      reports: [
-        {
-          title: "Workforce Statistics",
-          href: "#",
-          metrics: {
-            "Total Employees": "3,420",
-            "Active Employees": "97%",
-            "New Hires This Year": "285",
-            "Permanent Employees": "2,480",
-            "Contractual Employees": "940",
-          },
-        },
-        {
-          title: "Attendance & Workforce Productivity",
-          href: "#",
-          metrics: {
-            "Average Attendance Rate": "95%",
-            "Lowest Department Attendance": "81%",
-            "Highest Department Attendance": "100%",
-            "Average Leave Utilization": "7.2 days",
-            "Employee Satisfaction Rate": "91%",
-          },
-        },
+      id: 10,
+      name: "Malamig",
+      position: [14.315, 121.072],
+      illnesses: [
+        { name: "Dengue", infected: 20 },
+        { name: "Influenza", infected: 15 },
+        { name: "Hypertension", infected: 26 },
+      ],
+    },
+
+    {
+      id: 11,
+      name: "Mampalasan",
+      position: [14.279, 121.052],
+      illnesses: [
+        { name: "Dengue", infected: 34 },
+        { name: "Diabetes", infected: 15 },
+        { name: "Influenza", infected: 21 },
+      ],
+    },
+
+    {
+      id: 12,
+      name: "Platero",
+      position: [14.299, 121.089],
+      illnesses: [
+        { name: "Dengue", infected: 41 },
+        { name: "Influenza", infected: 20 },
+        { name: "Hypertension", infected: 52 },
+      ],
+    },
+
+    {
+      id: 13,
+      name: "Poblacion",
+      position: [14.3418, 121.0912],
+      illnesses: [
+        { name: "Dengue", infected: 49 },
+        { name: "Influenza", infected: 31 },
+        { name: "Hypertension", infected: 60 },
+      ],
+    },
+
+    {
+      id: 14,
+      name: "San Antonio",
+      position: [14.286, 121.078],
+      illnesses: [
+        { name: "Dengue", infected: 28 },
+        { name: "Diabetes", infected: 17 },
+        { name: "Influenza", infected: 15 },
+      ],
+    },
+
+    {
+      id: 15,
+      name: "San Francisco (Halang)",
+      position: [14.309, 121.061],
+      illnesses: [
+        { name: "Dengue", infected: 44 },
+        { name: "Influenza", infected: 22 },
+        { name: "Hypertension", infected: 47 },
+      ],
+    },
+
+    {
+      id: 16,
+      name: "San Jose",
+      position: [14.327, 121.076],
+      illnesses: [
+        { name: "Dengue", infected: 30 },
+        { name: "Diabetes", infected: 13 },
+        { name: "Influenza", infected: 19 },
+      ],
+    },
+
+    {
+      id: 17,
+      name: "San Vicente",
+      position: [14.334, 121.082],
+      illnesses: [
+        { name: "Dengue", infected: 33 },
+        { name: "Influenza", infected: 24 },
+        { name: "Hypertension", infected: 45 },
+      ],
+    },
+
+    {
+      id: 18,
+      name: "Santo Domingo",
+      position: [14.346, 121.067],
+      illnesses: [
+        { name: "Dengue", infected: 26 },
+        { name: "Diabetes", infected: 14 },
+        { name: "Influenza", infected: 18 },
+      ],
+    },
+
+    {
+      id: 19,
+      name: "Santo Niño",
+      position: [14.352, 121.082],
+      illnesses: [
+        { name: "Dengue", infected: 35 },
+        { name: "Influenza", infected: 21 },
+        { name: "Hypertension", infected: 41 },
+      ],
+    },
+
+    {
+      id: 20,
+      name: "Santo Tomas",
+      position: [14.266, 121.126],
+      illnesses: [
+        { name: "Dengue", infected: 16 },
+        { name: "Influenza", infected: 12 },
+        { name: "Hypertension", infected: 22 },
+      ],
+    },
+
+    {
+      id: 21,
+      name: "Soro-Soro",
+      position: [14.288, 121.103],
+      illnesses: [
+        { name: "Dengue", infected: 24 },
+        { name: "Diabetes", infected: 10 },
+        { name: "Influenza", infected: 16 },
+      ],
+    },
+
+    {
+      id: 22,
+      name: "Timbao",
+      position: [14.277, 121.071],
+      illnesses: [
+        { name: "Dengue", infected: 39 },
+        { name: "Influenza", infected: 27 },
+        { name: "Hypertension", infected: 49 },
+      ],
+    },
+
+    {
+      id: 23,
+      name: "Tubigan",
+      position: [14.321, 121.094],
+      illnesses: [
+        { name: "Dengue", infected: 22 },
+        { name: "Diabetes", infected: 9 },
+        { name: "Influenza", infected: 13 },
+      ],
+    },
+
+    {
+      id: 24,
+      name: "Zapote",
+      position: [14.307, 121.099],
+      illnesses: [
+        { name: "Dengue", infected: 36 },
+        { name: "Influenza", infected: 25 },
+        { name: "Hypertension", infected: 44 },
       ],
     },
   ];
@@ -702,14 +605,12 @@ export default function Dashboard() {
           lg:h-[calc(100dvh-20px)]
           h-screen
 
-          ${
-            mobileMenuOpen
-              ? "translate-x-0"
-              : "-translate-x-[120%] lg:translate-x-0"
+          ${mobileMenuOpen
+            ? "translate-x-0"
+            : "-translate-x-[120%] lg:translate-x-0"
           }
 
-          ${
-            mobileMenuOpen ? "w-screen" : sidebarOpen ? "w-[380px]" : "w-[78px]"
+          ${mobileMenuOpen ? "w-screen" : sidebarOpen ? "w-[380px]" : "w-[78px]"
           }
       `}
       >
@@ -1015,26 +916,68 @@ export default function Dashboard() {
               <div className="order-2 xl:order-2 lg:order-3 flex flex-col gap-2 lg:col-span-12 xl:col-span-6 2xl:col-span-6 h-full lg:h-full 2xl:h-[83vh!important] min-h-0">
                 <div className="cyber-panel cyber-grid relative rounded-xl p-4 flex flex-col h-full min-h-0">
                   {/* HEADER */}
-                  <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                    <div>
-                      <h2 className="cyber-title text-xl font-bold md:text-2xl">
-                        Smart City CCTV Monitoring
-                      </h2>
+                  <div className="mb-4 flex flex-col gap-3">
+                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                      <div>
+                        <h2 className="cyber-title text-xl font-bold md:text-2xl">
+                          {activeMap === "cctv"
+                            ? "Smart City CCTV Monitoring"
+                            : "Health Information Management System"}
+                        </h2>
 
-                      <p className="text-sm text-cyan-200/70">
-                        Live Geographic Intelligence System
-                      </p>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <div className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-xs text-cyan-300">
-                        Biñan Laguna
+                        <p className="text-sm text-cyan-200/70">
+                          {activeMap === "cctv"
+                            ? "Live Geographic Intelligence System"
+                            : "Barangay Health Surveillance System"}
+                        </p>
                       </div>
 
-                      <div className="rounded-full border border-lime-400/30 bg-lime-500/10 px-4 py-2 text-xs text-lime-300">
-                        {cctvLocations.length} CCTV Online
+                      <div className="flex gap-2">
+                        <div className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-xs text-cyan-300">
+                          Biñan Laguna
+                        </div>
+
+                        <div
+                          className={`rounded-full px-4 py-2 text-xs ${activeMap === "cctv"
+                            ? "border border-lime-400/30 bg-lime-500/10 text-lime-300"
+                            : "border border-red-400/30 bg-red-500/10 text-red-300"
+                            }`}
+                        >
+                          {activeMap === "cctv"
+                            ? `${cctvLocations.length} CCTV Online`
+                            : `${barangays.length} Barangays Monitored`}
+                        </div>
                       </div>
                     </div>
+
+                    {/* MAP SELECTOR */}
+                    <details className="rounded-lg border border-cyan-400/20 bg-[#081121]/80">
+                      <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-cyan-300">
+                        Select Monitoring System
+                      </summary>
+
+                      <div className="flex flex-col gap-2 p-3">
+                        <button
+                          onClick={() => setActiveMap("cctv")}
+                          className={`rounded-lg px-4 py-2 text-left text-sm transition ${activeMap === "cctv"
+                            ? "bg-cyan-600 text-white"
+                            : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                            }`}
+                        >
+                          📹 Smart City CCTV Monitoring
+                        </button>
+
+                        <button
+                          onClick={() => setActiveMap("hims")}
+                          className={`rounded-lg px-4 py-2 text-left text-sm transition ${activeMap === "hims"
+                            ? "bg-red-600 text-white"
+                            : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                            }`}
+                        >
+                          🏥 Health Information Management System
+                        </button>
+                      </div>
+                    </details>
                   </div>
 
                   {/* MAP */}
@@ -1050,32 +993,77 @@ export default function Dashboard() {
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                       />
 
-                      {cctvLocations.map((camera) => (
-                        <Marker
-                          key={camera.id}
-                          position={camera.position as [number, number]}
-                          icon={createCctvIcon(camera.name)}
-                        >
-                          <Popup>
-                            <div className="space-y-2 min-w-[180px]">
-                              <h3 className="font-semibold">{camera.name}</h3>
+                      {/* CCTV MAP */}
+                      {activeMap === "cctv" &&
+                        cctvLocations.map((camera) => (
+                          <Marker
+                            key={camera.id}
+                            position={camera.position as [number, number]}
+                            icon={createCctvIcon(camera.name)}
+                          >
+                            <Popup>
+                              <div className="space-y-2 min-w-[180px]">
+                                <h3 className="font-semibold">{camera.name}</h3>
 
-                              <button
-                                onClick={() =>
-                                  window.open(
-                                    camera.url,
-                                    "_blank",
-                                    "noopener,noreferrer",
-                                  )
-                                }
-                                className="rounded bg-cyan-600 px-3 py-1 text-white text-sm"
-                              >
-                                View Live CCTV Footage
-                              </button>
-                            </div>
-                          </Popup>
-                        </Marker>
-                      ))}
+                                <button
+                                  onClick={() =>
+                                    window.open(
+                                      camera.url,
+                                      "_blank",
+                                      "noopener,noreferrer",
+                                    )
+                                  }
+                                  className="rounded bg-cyan-600 px-3 py-1 text-white text-sm"
+                                >
+                                  View Live CCTV Footage
+                                </button>
+                              </div>
+                            </Popup>
+                          </Marker>
+                        ))}
+
+                      {/* HIMS MAP */}
+                      {activeMap === "hims" &&
+                        barangays.map((barangay) => (
+                          <Marker
+                            key={barangay.id}
+                            position={barangay.position as [number, number]}
+                            icon={createHealthIcon(barangay.name)}
+                          >
+                            <Popup>
+                              <div className="min-w-[220px] space-y-3">
+                                <h3 className="font-semibold text-red-600">
+                                  {barangay.name}
+                                </h3>
+
+                                <div className="text-sm font-medium">
+                                  Common Illness Cases
+                                </div>
+
+                                <ul className="space-y-1 text-sm">
+                                  {barangay.illnesses.map((illness) => (
+                                    <li key={illness.name}>
+                                      • {illness.name} ({illness.infected})
+                                    </li>
+                                  ))}
+                                </ul>
+
+                                <button
+                                  onClick={() =>
+                                    window.open(
+                                      "/health-dashboard",
+                                      "_blank",
+                                      "noopener,noreferrer",
+                                    )
+                                  }
+                                  className="rounded bg-red-600 px-3 py-1 text-white text-sm"
+                                >
+                                  View Health Dashboard
+                                </button>
+                              </div>
+                            </Popup>
+                          </Marker>
+                        ))}
                     </MapContainer>
 
                     {/* OVERLAY */}
@@ -1084,13 +1072,22 @@ export default function Dashboard() {
                     {/* LEGEND */}
                     <div className="absolute bottom-4 left-4 z-[1000] rounded-lg border border-cyan-400/30 bg-[#081121]/90 px-4 py-3 backdrop-blur">
                       <div className="mb-2 text-xs font-semibold text-cyan-300">
-                        CCTV STATUS
+                        {activeMap === "cctv"
+                          ? "CCTV STATUS"
+                          : "HEALTH SURVEILLANCE"}
                       </div>
 
-                      <div className="flex items-center gap-2 text-xs text-white">
-                        <span className="h-3 w-3 rounded-full bg-red-500" />
-                        Active Camera
-                      </div>
+                      {activeMap === "cctv" ? (
+                        <div className="flex items-center gap-2 text-xs text-white">
+                          <span className="h-3 w-3 rounded-full bg-red-500" />
+                          Active Camera
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 text-xs text-white">
+                          <span className="h-3 w-3 rounded-full bg-red-500" />
+                          Barangay Health Data
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
