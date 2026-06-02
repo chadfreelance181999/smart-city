@@ -150,6 +150,7 @@ export default function AdminDashboardDepartmentsPage() {
                 <th className="px-6 py-4 text-left">Subtitle</th>
                 <th className="px-6 py-4 text-left">Icon</th>
                 <th className="px-6 py-4 text-left">Description</th>
+                <th className="px-6 py-4 text-left">Color</th>
                 <th className="px-6 py-4 text-left">Actions</th>
               </tr>
             </thead>
@@ -166,6 +167,11 @@ export default function AdminDashboardDepartmentsPage() {
                   <td className="px-6 py-4">{department.subTitle}</td>
                   <td className="px-6 py-4">{department.icon}</td>
                   <td className="px-6 py-4">{department.description}</td>
+                  <td className="px-6 py-4">
+                    {department.color && (
+                      <span style={{ backgroundColor: department.color }} className="inline-block w-6 h-6 rounded-full"></span>
+                    )}
+                  </td>
 
                   <td className="px-6 py-4">
                     <div className="flex flex-wrap gap-2">

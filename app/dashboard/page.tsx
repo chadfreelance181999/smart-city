@@ -4,16 +4,23 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Bell, Menu } from "lucide-react";
 import { signOut } from "next-auth/react";
-import { DepartmentsModel } from "../generated/prisma/models";
+import {
+  DepartmentReportsModel,
+  DepartmentsModel,
+  ReportMetricsModel,
+} from "../generated/prisma/models";
+import moment from "moment";
 
 const Globe = dynamic(() => import("react-globe.gl"), {
   ssr: false,
 });
 
-interface DepartmentsModelWithCount extends DepartmentsModel {
-  _count: {
-    reports: number;
-  };
+interface ReportsWithMetrics extends DepartmentReportsModel {
+  metrics: ReportMetricsModel[];
+}
+
+interface DepartmentsWithReports extends DepartmentsModel {
+  reports: ReportsWithMetrics[];
 }
 
 const MapContainer = dynamic(
@@ -31,21 +38,27 @@ const Marker = dynamic(
   { ssr: false },
 ) as any;
 
-const Popup = dynamic(
-  () => import("react-leaflet").then((mod) => mod.Popup),
-  { ssr: false },
-) as any;
+const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
+  ssr: false,
+}) as any;
 
 export default function Dashboard() {
-  const [selectedModule, setSelectedModule] = useState<any>(null);
+  const [selectedModule, setSelectedModule] =
+    useState<DepartmentsWithReports | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [leaflet, setLeaflet] = useState<any>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openWeeklyBriefer, setOpenWeeklyBriefer] = useState(false);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
-  const [departments, setDepartments] = useState<DepartmentsModelWithCount[]>(
+  const [departments, setDepartments] = useState<DepartmentsWithReports[]>(
     [],
   );
+  const [weeklyReports, setWeeklyReports] = useState<DepartmentsWithReports[]>(
+    [],
+  );
+
+  const [weeklyReportsFetched, setWeeklyReportsFetched] = useState(false);
+
   const globeRef = useRef<any>(null);
   const [mounted, setMounted] = useState(false);
   const [weather, setWeather] = useState({
@@ -111,7 +124,15 @@ export default function Dashboard() {
       setMounted(true);
     };
 
+    const fetchWeeklyReports = async () => {
+      const res = await fetch("/api/weekly-reports");
+      const weeklyReports = await res.json();
+      setWeeklyReports(weeklyReports);
+      setWeeklyReportsFetched(true);
+    };
+
     void fetchDepartments();
+    void fetchWeeklyReports();
   }, []);
 
   useEffect(() => {
@@ -272,16 +293,18 @@ export default function Dashboard() {
   ];
 
   const totalLinks = departments.reduce(
-    (sum, department) => sum + department._count.reports,
+    (sum, department) => sum + department.reports.length,
     0,
   );
 
-  const donutData = departments.map((department, index) => ({
-    ...department,
-    color: department.color,
-    value: department._count.reports,
-    percent: (department._count.reports / totalLinks) * 100,
-  }));
+  const donutData = departments
+    .filter((department) => department.reports.length > 0)
+    .map((department, index) => ({
+      ...department,
+      color: department.color,
+      value: department.reports.length,
+      percent: (department.reports.length / totalLinks) * 100,
+    }));
 
   const cctvLocations = [
     {
@@ -583,7 +606,8 @@ export default function Dashboard() {
     },
 
     {
-      department: "AFIMS (Accounting and Finance Information Management System)",
+      department:
+        "AFIMS (Accounting and Finance Information Management System)",
       reports: [
         {
           title: "City Revenue & Expenditure",
@@ -678,12 +702,14 @@ export default function Dashboard() {
           lg:h-[calc(100dvh-20px)]
           h-screen
 
-          ${mobileMenuOpen
-            ? "translate-x-0"
-            : "-translate-x-[120%] lg:translate-x-0"
+          ${
+            mobileMenuOpen
+              ? "translate-x-0"
+              : "-translate-x-[120%] lg:translate-x-0"
           }
 
-          ${mobileMenuOpen ? "w-screen" : sidebarOpen ? "w-[380px]" : "w-[78px]"
+          ${
+            mobileMenuOpen ? "w-screen" : sidebarOpen ? "w-[380px]" : "w-[78px]"
           }
       `}
       >
@@ -805,17 +831,19 @@ export default function Dashboard() {
                       </p>
                     </div>
 
-                    <span
-                      className="
+                    {department._count.reports > 0 && (
+                      <span
+                        className="
                         rounded-full
                         border border-cyan-400/20
                         px-2 py-1
                         text-xs
                         text-cyan-300
                     "
-                    >
-                      {department._count.reports}
-                    </span>
+                      >
+                        {department._count.reports}
+                      </span>
+                    )}
                   </div>
                 )}
               </button>
@@ -981,13 +1009,11 @@ export default function Dashboard() {
                     ))}
                   </div>
                 </div>
-
               </div>
 
               {/* CENTER */}
               <div className="order-2 xl:order-2 lg:order-3 flex flex-col gap-2 lg:col-span-12 xl:col-span-6 2xl:col-span-6 h-full lg:h-full 2xl:h-[83vh!important] min-h-0">
                 <div className="cyber-panel cyber-grid relative rounded-xl p-4 flex flex-col h-full min-h-0">
-
                   {/* HEADER */}
                   <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     <div>
@@ -1013,7 +1039,6 @@ export default function Dashboard() {
 
                   {/* MAP */}
                   <div className="relative flex-1 overflow-hidden rounded-xl border border-cyan-400/20 bg-[#050816]">
-
                     <MapContainer
                       center={center}
                       zoom={13}
@@ -1021,7 +1046,7 @@ export default function Dashboard() {
                       className="h-[500px] xl:h-full w-full z-0"
                     >
                       <TileLayer
-                        attribution='&copy; OpenStreetMap contributors'
+                        attribution="&copy; OpenStreetMap contributors"
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                       />
 
@@ -1033,16 +1058,14 @@ export default function Dashboard() {
                         >
                           <Popup>
                             <div className="space-y-2 min-w-[180px]">
-                              <h3 className="font-semibold">
-                                {camera.name}
-                              </h3>
+                              <h3 className="font-semibold">{camera.name}</h3>
 
                               <button
                                 onClick={() =>
                                   window.open(
                                     camera.url,
                                     "_blank",
-                                    "noopener,noreferrer"
+                                    "noopener,noreferrer",
                                   )
                                 }
                                 className="rounded bg-cyan-600 px-3 py-1 text-white text-sm"
@@ -1163,7 +1186,7 @@ export default function Dashboard() {
                                     cy={cy}
                                     r={radius}
                                     fill="none"
-                                    stroke={color || ''}
+                                    stroke={color || ""}
                                     strokeWidth="42"
                                     strokeDasharray={`${dash} ${circumference}`}
                                     strokeDashoffset={-offset}
@@ -1184,7 +1207,7 @@ export default function Dashboard() {
                                     y1={y1}
                                     x2={x2}
                                     y2={y2}
-                                    stroke={color || ''}
+                                    stroke={color || ""}
                                     strokeWidth="2"
                                   />
 
@@ -1193,7 +1216,7 @@ export default function Dashboard() {
                                     y1={y2}
                                     x2={x3}
                                     y2={y2}
-                                    stroke={color || ''}
+                                    stroke={color || ""}
                                     strokeWidth="2"
                                   />
 
@@ -1246,12 +1269,12 @@ export default function Dashboard() {
 
                   <button
                     onClick={() => setOpenWeeklyBriefer(true)}
+                    disabled={!weeklyReportsFetched}
                     className="my-3 rounded-lg bg-cyan-500/10 px-4 py-2 text-cyan-100 hover:bg-cyan-500/20 block mx-auto"
                   >
                     View Weekly Briefer
                   </button>
                 </div>
-
               </div>
             </div>
           </div>
@@ -1282,24 +1305,35 @@ export default function Dashboard() {
             </div>
 
             <div className="space-y-4">
-              {/* {selectedModule.links.map(
-                  (link: any, index: number) => (
-                    <a
-                      key={index}
-                      href={link.url}
-                      className="flex items-center justify-between rounded-2xl border border-cyan-400/20 bg-cyan-500/5 px-5 py-4 transition hover:bg-cyan-500/10"
-                    >
+              {selectedModule.link && (
+                <a
+                  key={"department-link" + selectedModule.id}
+                  href={selectedModule.link}
+                  target="_blank"
+                  className="flex items-center justify-between rounded-2xl border border-cyan-400/20 bg-cyan-500/5 px-5 py-4 transition hover:bg-cyan-500/10"
+                >
+                  <span className="font-medium text-cyan-100">
+                    Open Dashboard
+                  </span>
 
-                      <span className="font-medium text-cyan-100">
-                        {link.label}
-                      </span>
+                  <span className="text-cyan-300">Open →</span>
+                </a>
+              )}
 
-                      <span className="text-cyan-300">
-                        Open →
-                      </span>
-                    </a>
-                  )
-                )} */}
+              {selectedModule.reports.map((report) => (
+                <a
+                  key={"department-report" + report.id}
+                  href={report.url || '#'}
+                  target="_blank"
+                  className="flex items-center justify-between rounded-2xl border border-cyan-400/20 bg-cyan-500/5 px-5 py-4 transition hover:bg-cyan-500/10"
+                >
+                  <span className="font-medium text-cyan-100">
+                    {report.title}
+                  </span>
+
+                  <span className="text-cyan-300">Open →</span>
+                </a>
+              ))}
             </div>
           </div>
         </div>
@@ -1309,16 +1343,14 @@ export default function Dashboard() {
       {openWeeklyBriefer && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
           <div className="cyber-panel cyber-grid w-full max-w-2xl rounded-3xl p-8 shadow-2xl">
-
             {/* Header */}
             <div className="flex items-center justify-between border-b border-cyan-500/20 p-6">
               <div>
                 <h2 className="text-3xl font-bold text-cyan-100">
                   Mayor's Weekly Briefer
                 </h2>
-                <p className="text-cyan-300/70">
-                  Available Links & Resources
-                </p>
+                <p className="text-cyan-300/70">Available Links & Resources</p>
+                <p className="text-cyan-300/70">{moment().isoWeekday(1).format("MMMM DD, YYYY")} - {moment().isoWeekday(5).endOf('day').format("MMMM DD, YYYY")}</p>
               </div>
 
               <button
@@ -1331,19 +1363,18 @@ export default function Dashboard() {
 
             {/* Content */}
             <div className="max-h-[75vh] overflow-y-auto p-6 space-y-6">
-
-              {weeklyBrieferData.map((department) => (
+              {weeklyReports.map((department) => (
                 <div
-                  key={department.department}
+                  key={"department-" + department.id}
                   className="rounded-xl border border-cyan-500/20 bg-cyan-950/10 p-4"
                 >
                   <h3 className="mb-4 text-lg font-semibold text-cyan-300">
-                    {department.department}
+                    {department.title}
                   </h3>
 
                   <div className="space-y-3">
                     {department.reports.map((report) => {
-                      const key = `${department.department}-${report.title}`;
+                      const key = `${department.id}-${report.id}`;
 
                       return (
                         <div
@@ -1353,43 +1384,39 @@ export default function Dashboard() {
                           <button
                             onClick={() =>
                               setOpenAccordion(
-                                openAccordion === key ? null : key
+                                openAccordion === key ? null : key,
                               )
                             }
                             className="flex w-full items-center justify-between p-4 text-left"
                           >
                             <a
-                              href={report.href}
+                              href={report.url || ""}
                               target="_blank"
                               className="font-medium text-cyan-200 underline"
                             >
                               {report.title}
                             </a>
 
-                            <span>
-                              {openAccordion === key ? "−" : "+"}
-                            </span>
+                            <span>{openAccordion === key ? "−" : "+"}</span>
                           </button>
 
                           {openAccordion === key && (
                             <div className="border-t border-cyan-500/10 p-4">
                               <ul className="space-y-2">
-                                {Object.entries(report.metrics).map(
-                                  ([metric, value]) => (
-                                    <li
-                                      key={metric}
-                                      className="flex justify-between text-sm"
-                                    >
-                                      <span className="text-cyan-100/80">
-                                        {metric}
-                                      </span>
+                                {report.metrics.map((metric) => (
+                                  <li
+                                    key={"metric" + metric}
+                                    className="flex justify-between text-sm"
+                                  >
+                                    <span className="text-cyan-100/80">
+                                      {metric.name}
+                                    </span>
 
-                                      <span className="font-medium text-cyan-300">
-                                        {value}
-                                      </span>
-                                    </li>
-                                  )
-                                )}
+                                    <span className="font-medium text-cyan-300">
+                                      {metric.value}
+                                    </span>
+                                  </li>
+                                ))}
                               </ul>
                             </div>
                           )}
@@ -1399,7 +1426,6 @@ export default function Dashboard() {
                   </div>
                 </div>
               ))}
-
             </div>
           </div>
         </div>

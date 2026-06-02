@@ -57,7 +57,7 @@ model ReportMetrics {
   id          Int     @id @default(autoincrement())
   reportId    Int
   name        String
-  value       Int
+  value       String
   description String?
 
   createdAt DateTime          @default(now())

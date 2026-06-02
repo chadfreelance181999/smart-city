@@ -5,7 +5,7 @@ import { X } from 'lucide-react';
 
 import { DepartmentsModel, DepartmentReportsModel, ReportMetricsModel } from '@/app/generated/prisma/models';
 
-interface DepartmentRecordFormModalProps {
+interface UpdateDepartmentRecordFormModalProps {
   isOpen: boolean
   onClose: () => void
   onSubmit: (report: Partial<DepartmentReportsModel>, metrics: Partial<ReportMetricsModel>[]) => Promise<void>
@@ -13,12 +13,12 @@ interface DepartmentRecordFormModalProps {
   isLoading?: boolean
 }
 
-export default function DepartmentRecordFormModal({
+export default function UpdateDepartmentRecordFormModal({
   onClose,
   onSubmit,
   departmentId,
   isLoading = false,
-}: DepartmentRecordFormModalProps) {
+}: UpdateDepartmentRecordFormModalProps) {
   const defaultFormData: Partial<DepartmentReportsModel> = useMemo(() => ({
     title: '',
     description: '',

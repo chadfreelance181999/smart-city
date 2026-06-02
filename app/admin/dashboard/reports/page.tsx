@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react";
 
-import DepartmentFormModal from "@/app/admin/components/DepartmentFormModal";
-import DepartmentRecordsFormModal from "../../components/DepartmentRecordsFormModal";
 import { DepartmentsModel, DepartmentReportsModel, ReportMetricsModel } from "@/app/generated/prisma/internal/prismaNamespaceBrowser";
 
 interface DepartmentWithRelations extends DepartmentReportsModel {
@@ -12,11 +10,6 @@ interface DepartmentWithRelations extends DepartmentReportsModel {
 
 export default function AdminDashboardDepartmentsPage() {
   const [departments, setDepartments] = useState<DepartmentWithRelations[]>([]);
-  const [isDeptFormOpen, setIsDeptFormOpen] = useState(false);
-  const [isReportFormOpen, setIsReportFormOpen] = useState(false);
-  const [selectedDepartment, setSelectedDepartment] =
-    useState<DepartmentWithRelations | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [refreshFlag, setRefreshFlag] = useState(true);
 
   useEffect(() => {
@@ -30,53 +23,10 @@ export default function AdminDashboardDepartmentsPage() {
     if (refreshFlag) void fetchDepartments();
   }, [refreshFlag]);
 
-  const handleCreateDepartment = async (
-    department: Partial<DepartmentReportsModel>,
-  ) => {
-    try {
-      setIsLoading(true);
-      await fetch("/api/departments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(department),
-      });
-    } catch (error) {
-      console.error("Error creating department:", error);
-    } finally {
-      setIsLoading(false);
-      setIsDeptFormOpen(false);
-      setRefreshFlag(true);
-    }
-  };
-
-  const handleUpdateDepartment = async (
-    department: Partial<DepartmentReportsModel>,
-  ) => {
-    try {
-      setIsLoading(true);
-      await fetch(`/api/departments/${department.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(department),
-      });
-    } catch (error) {
-      console.error("Error updating department:", error);
-    } finally {
-      setIsLoading(false);
-      setIsDeptFormOpen(false);
-      setRefreshFlag(true);
-    }
-  };
-
   const handleDeleteReport = async (
     department: Partial<DepartmentReportsModel>,
   ) => {
     try {
-      setIsLoading(true);
       await fetch(`/api/department-reports/${department.id}`, {
         method: "DELETE",
       });
@@ -84,32 +34,6 @@ export default function AdminDashboardDepartmentsPage() {
     } catch (error) {
       console.error("Error deleting department:", error);
     } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleCreateReport = async (
-    report: Partial<DepartmentReportsModel>,
-    metrics: Partial<ReportMetricsModel>[] = [],
-  ) => {
-    try {
-      setIsLoading(true);
-      await fetch(`/api/department-reports`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...report,
-          metrics: metrics
-        }),
-      });
-    } catch (error) {
-      console.error("Error creating report:", error);
-    } finally {
-      setIsLoading(false);
-      setIsReportFormOpen(false);
-      setRefreshFlag(true);
     }
   };
 
@@ -133,15 +57,12 @@ export default function AdminDashboardDepartmentsPage() {
             <h2 className="text-3xl font-bold">Reports</h2>
           </div>
 
-          <button
+          <a
+            href={"/admin/dashboard/departments/"}
             className="px-5 py-3 rounded-2xl bg-cyan-400 text-black font-semibold hover:scale-105 transition"
-            onClick={() => {
-              setSelectedDepartment(null);
-              setIsDeptFormOpen(true);
-            }}
           >
             + Add report
-          </button>
+          </a>
         </div>
 
         <div className="overflow-x-auto rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl shadow-2xl">
@@ -153,7 +74,7 @@ export default function AdminDashboardDepartmentsPage() {
                 <th className="px-6 py-4 text-left">Description</th>
                 <th className="px-6 py-4 text-left">URL</th>
                 <th className="px-6 py-4 text-left">Department</th>
-                <th className="px-6 py-4 text-left">Actions</th>
+                {/* <th className="px-6 py-4 text-left">Actions</th> */}
               </tr>
             </thead>
 
@@ -170,7 +91,7 @@ export default function AdminDashboardDepartmentsPage() {
                   <td className="px-6 py-4">{department.url}</td>
                   <td className="px-6 py-4">{department.department?.subTitle}</td>
 
-                  <td className="px-6 py-4">
+                  {/* <td className="px-6 py-4">
                     <div className="flex flex-wrap gap-2">
                       <button
                         className="px-4 py-2 rounded-xl text-white font-medium hover:scale-105 transition"
@@ -199,7 +120,7 @@ export default function AdminDashboardDepartmentsPage() {
                         Delete
                       </button>
                     </div>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>

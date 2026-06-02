@@ -7,9 +7,7 @@ export const GET = async (request: Request) => {
       id: 'asc'
     },
     include: {
-      _count: {
-        select: { reports: true },
-      },
+      reports: true,
     },
   })
 
