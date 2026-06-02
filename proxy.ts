@@ -13,10 +13,10 @@ const proxy = async (request: NextRequest) => {
 
   const authCookie = request.cookies.get('authjs.session-token');
 
-  if (!authCookie?.value) {
-    const redirectUrl = pathName.startsWith('/admin') ? '/admin/login' : '/dashboard/login';
-    return NextResponse.redirect(new URL(redirectUrl, request.url));
-  }
+  // if (!authCookie?.value) {
+  //   const redirectUrl = pathName.startsWith('/admin') ? '/admin/login' : '/dashboard/login';
+  //   return NextResponse.redirect(new URL(redirectUrl, request.url));
+  // }
 
   return NextResponse.next();
 }

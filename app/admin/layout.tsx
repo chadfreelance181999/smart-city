@@ -1,5 +1,7 @@
+'use client'
+
 import AuthProvider from "./components/AuthProvider";
 
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return <AuthProvider>{children}</AuthProvider>
 }
