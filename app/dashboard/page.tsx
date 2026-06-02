@@ -831,7 +831,7 @@ export default function Dashboard() {
                       </p>
                     </div>
 
-                    {department._count.reports > 0 && (
+                    {department.reports.length > 0 && (
                       <span
                         className="
                         rounded-full
@@ -841,7 +841,7 @@ export default function Dashboard() {
                         text-cyan-300
                     "
                       >
-                        {department._count.reports}
+                        {department.reports.length}
                       </span>
                     )}
                   </div>
