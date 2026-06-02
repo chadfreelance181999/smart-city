@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, Bell, Menu } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { DepartmentsModel } from "../generated/prisma/models";
 
-type LatLngTuple = [number, number];
+import type { MapContainerProps } from "react-leaflet";
 
 const Globe = dynamic(() => import("react-globe.gl"), {
   ssr: false,
@@ -18,10 +18,34 @@ interface DepartmentsModelWithCount extends DepartmentsModel {
   };
 }
 
+const MapContainer = dynamic<MapContainerProps>(
+  () =>
+    import("react-leaflet").then(
+      (mod) => mod.MapContainer
+    ),
+  {
+    ssr: false,
+  },
+);
+
+const TileLayer = dynamic(
+  () => import("react-leaflet").then((mod) => mod.TileLayer),
+  { ssr: false },
+);
+
+const Marker = dynamic(
+  () => import("react-leaflet").then((mod) => mod.Marker),
+  { ssr: false },
+);
+
+const Popup = dynamic(
+  () => import("react-leaflet").then((mod) => mod.Popup),
+  { ssr: false },
+);
+
 export default function Dashboard() {
   const [selectedModule, setSelectedModule] = useState<any>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const center: LatLngTuple = [14.3386, 121.0889];
   const [leaflet, setLeaflet] = useState<any>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openWeeklyBriefer, setOpenWeeklyBriefer] = useState(false);
@@ -265,27 +289,6 @@ export default function Dashboard() {
     value: department._count.reports,
     percent: (department._count.reports / totalLinks) * 100,
   }));
-
-
-  const MapContainer = dynamic(
-    () => import("react-leaflet").then((mod) => mod.MapContainer),
-    { ssr: false },
-  );
-
-  const TileLayer = dynamic(
-    () => import("react-leaflet").then((mod) => mod.TileLayer),
-    { ssr: false },
-  );
-
-  const Marker = dynamic(
-    () => import("react-leaflet").then((mod) => mod.Marker),
-    { ssr: false },
-  );
-
-  const Popup = dynamic(
-    () => import("react-leaflet").then((mod) => mod.Popup),
-    { ssr: false },
-  );
 
   const cctvLocations = [
     {
@@ -642,6 +645,9 @@ export default function Dashboard() {
       ],
     },
   ];
+
+  type LatLngTuple = [number, number];
+  const center: LatLngTuple = [14.3386, 121.0889];
 
   return (
     <main className="relative h-full min-h-0 overflow-hidden bg-[#020617] text-white">
