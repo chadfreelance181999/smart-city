@@ -5,14 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Bell, Menu } from "lucide-react";
 import { signOut } from "next-auth/react";
 
-import {
-  ComposableMap,
-  Geographies,
-  Geography,
-  Marker,
-  ZoomableGroup,
-} from "react-simple-maps";
-
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { DepartmentsModel } from "../generated/prisma/models";
 
@@ -28,8 +20,11 @@ interface DepartmentsModelWithCount extends DepartmentsModel {
 
 export default function Dashboard() {
   const [selectedModule, setSelectedModule] = useState<any>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [leaflet, setLeaflet] = useState<any>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [openWeeklyBriefer, setOpenWeeklyBriefer] = useState(false);
+  const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const [departments, setDepartments] = useState<DepartmentsModelWithCount[]>(
     [],
   );
@@ -99,6 +94,19 @@ export default function Dashboard() {
     };
 
     void fetchDepartments();
+  }, []);
+
+  useEffect(() => {
+    const loadLeaflet = async () => {
+      // Leaflet has no bundled TypeScript declarations in this project.
+      // Silence the implicit any error by treating the dynamic import as any.
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const L = (await import("leaflet")) as any;
+      setLeaflet(L);
+    };
+
+    loadLeaflet();
   }, []);
 
   const modules = [
@@ -205,18 +213,18 @@ export default function Dashboard() {
   ];
 
   const bars = [
-    { month: "Dec", value: 7 },
-    { month: "Nov", value: 4 },
-    { month: "Oct", value: 8 },
-    { month: "Sep", value: 6 },
-    { month: "Aug", value: 3 },
-    { month: "Jul", value: 5 },
-    { month: "Jun", value: 7 },
-    { month: "May", value: 2 },
-    { month: "Apr", value: 3 },
-    { month: "Mar", value: 4 },
-    { month: "Feb", value: 2 },
-    { month: "Jan", value: 1 },
+    { month: "Dec", value: 0 },
+    { month: "Nov", value: 0 },
+    { month: "Oct", value: 0 },
+    { month: "Sep", value: 0 },
+    { month: "Aug", value: 0 },
+    { month: "Jul", value: 0 },
+    { month: "Jun", value: 12 },
+    { month: "May", value: 97 },
+    { month: "Apr", value: 100 },
+    { month: "Mar", value: 100 },
+    { month: "Feb", value: 100 },
+    { month: "Jan", value: 100 },
   ];
 
   const stats = [
@@ -257,8 +265,385 @@ export default function Dashboard() {
     percent: (department._count.reports / totalLinks) * 100,
   }));
 
+
+  const MapContainer = dynamic(
+    () => import("react-leaflet").then((mod) => mod.MapContainer),
+    { ssr: false },
+  );
+
+  const TileLayer = dynamic(
+    () => import("react-leaflet").then((mod) => mod.TileLayer),
+    { ssr: false },
+  );
+
+  const Marker = dynamic(
+    () => import("react-leaflet").then((mod) => mod.Marker),
+    { ssr: false },
+  );
+
+  const Popup = dynamic(
+    () => import("react-leaflet").then((mod) => mod.Popup),
+    { ssr: false },
+  );
+
+  const cctvLocations = [
+    {
+      id: 1,
+      name: "Biñan City Hall CCTV",
+      position: [14.3386, 121.0889],
+      url: "https://www.youtube.com/watch?v=Uwfh5hVJAXA",
+    },
+    {
+      id: 2,
+      name: "Biñan Plaza CCTV",
+      position: [14.3362, 121.0848],
+      url: "https://www.youtube.com/watch?v=Uwfh5hVJAXA",
+    },
+    {
+      id: 3,
+      name: "Southwoods Exit CCTV",
+      position: [14.3014, 121.0561],
+      url: "https://www.youtube.com/watch?v=Uwfh5hVJAXA",
+    },
+    {
+      id: 4,
+      name: "Poblacion CCTV",
+      position: [14.3418, 121.0912],
+      url: "https://www.youtube.com/watch?v=Uwfh5hVJAXA",
+    },
+  ];
+
+  const createCctvIcon = (name: string) => {
+    if (!leaflet) return null;
+
+    return new leaflet.DivIcon({
+      html: `
+      <div style="
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        gap:4px;
+      ">
+        <div style="
+          background:rgba(8,17,33,.95);
+          border:1px solid rgba(34,211,238,.5);
+          color:#67e8f9;
+          padding:4px 8px;
+          border-radius:999px;
+          font-size:11px;
+          font-weight:600;
+          white-space:nowrap;
+          box-shadow:0 0 15px rgba(34,211,238,.25);
+        ">
+          ${name}
+        </div>
+
+        <div style="
+          width:38px;
+          height:38px;
+          border-radius:50%;
+          background:#081121;
+          border:2px solid #22d3ee;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          font-size:18px;
+          box-shadow:0 0 20px rgba(34,211,238,.6);
+        ">
+          📹
+        </div>
+      </div>
+    `,
+      className: "",
+      iconSize: [140, 60],
+      iconAnchor: [70, 50],
+    });
+  };
+
+  const weeklyBrieferData = [
+    {
+      department: "CCDC (Command, Control and Data Center)",
+      reports: [
+        {
+          title: "City Systems Availability",
+          href: "https://docs.google.com/document/d/1zZswe33Dav0ecrqa2guDspnY1ku2hHpxrDRgoSUc8fU/edit?usp=sharing",
+          metrics: {
+            "Average Uptime": "99.8%",
+            "Lowest Monthly Uptime": "97.6%",
+            "Highest Monthly Uptime": "100%",
+            "Systems Monitored": "42",
+            "Active CCTV Cameras": "685",
+          },
+        },
+        {
+          title: "Emergency & Incident Response",
+          href: "#",
+          metrics: {
+            "Average Response Time": "3.8 mins",
+            "Fastest Response": "45 secs",
+            "Longest Response": "14 mins",
+            "Total Incidents Resolved": "1,245",
+            "Resolution Rate": "98%",
+          },
+        },
+      ],
+    },
+
+    {
+      department: "SSDMS (Social Services Distribution Management System)",
+      reports: [
+        {
+          title: "Social Assistance Distribution",
+          href: "#",
+          metrics: {
+            "Beneficiaries Served": "14,250",
+            "Average Assistance Released": "₱4,200",
+            "Distribution Completion Rate": "97%",
+            "Barangays Completed": "24 / 24",
+            "Total Assistance Released": "₱59.8M",
+          },
+        },
+        {
+          title: "Assistance Application Processing",
+          href: "#",
+          metrics: {
+            "Average Processing Time": "2.8 days",
+            "Fastest Processing": "6 hours",
+            "Longest Processing": "9 days",
+            "Application Approval Rate": "94%",
+            "Applications Processed": "15,160",
+          },
+        },
+      ],
+    },
+
+    {
+      department: "HIMS (Health Information Management System)",
+      reports: [
+        {
+          title: "Public Health Consultations",
+          href: "#",
+          metrics: {
+            "Average Daily Patients": "870",
+            "Lowest Daily Count": "420",
+            "Highest Daily Count": "1,340",
+            "Monthly Consultations": "26,100",
+            "Vaccination Coverage": "93%",
+          },
+        },
+        {
+          title: "Health Facility Utilization",
+          href: "#",
+          metrics: {
+            "Average Bed Occupancy": "82%",
+            "Lowest Occupancy": "58%",
+            "Highest Occupancy": "99%",
+            "Available Beds": "520",
+            "Emergency Response Rate": "96%",
+          },
+        },
+      ],
+    },
+
+    {
+      department: "GIS (City Development Dynamic GIS Mapping)",
+      reports: [
+        {
+          title: "Barangay Mapping Coverage",
+          href: "#",
+          metrics: {
+            "Mapped Areas": "96%",
+            "Lowest Barangay Coverage": "78%",
+            "Highest Coverage": "100%",
+            "Roads Digitized": "1,280 km",
+            "Infrastructure Assets Tagged": "18,450",
+          },
+        },
+        {
+          title: "Land Use Distribution",
+          href: "#",
+          metrics: {
+            "Residential Areas": "48%",
+            "Industrial Areas": "27%",
+            "Commercial & Institutional Areas": "25%",
+            "Total Mapped Land Area": "4,350 hectares",
+            "Zoning Compliance Rate": "92%",
+          },
+        },
+      ],
+    },
+
+    {
+      department: "CRMS (Citizen Registration Management System)",
+      reports: [
+        {
+          title: "Resident Registration Overview",
+          href: "#",
+          metrics: {
+            "Registered Residents": "312,450",
+            "Average Daily Registrations": "520",
+            "Peak Registrations": "1,120",
+            "Active Records": "98%",
+            "New Registrations This Year": "18,600",
+          },
+        },
+        {
+          title: "Population Demographics",
+          href: "#",
+          metrics: {
+            Male: "49.2%",
+            Female: "50.3%",
+            Others: "0.5%",
+            "Working Age Population": "64%",
+            "Senior Citizens": "9%",
+          },
+        },
+      ],
+    },
+
+    {
+      department: "BPLO (Business Permit License Office System)",
+      reports: [
+        {
+          title: "Business Permit Applications",
+          href: "#",
+          metrics: {
+            "Applications Received": "8,950",
+            "Approval Rate": "93%",
+            "Rejection Rate": "7%",
+            "New Businesses Registered": "1,850",
+            "Renewals Processed": "7,100",
+          },
+        },
+        {
+          title: "Permit Processing Performance",
+          href: "#",
+          metrics: {
+            "Average Processing Time": "1.9 days",
+            "Fastest Approval": "2 hours",
+            "Longest Approval": "8 days",
+            "Same-Day Approvals": "68%",
+            "Customer Satisfaction Rate": "96%",
+          },
+        },
+      ],
+    },
+
+    {
+      department: "RPTAS (Real Property Tax and Assessment System)",
+      reports: [
+        {
+          title: "Real Property Tax Collection",
+          href: "#",
+          metrics: {
+            "Total Collection": "₱485M",
+            "Collection Efficiency Rate": "89%",
+            "Highest Monthly Collection": "₱56M",
+            "Delinquency Rate": "11%",
+            "Collection Growth": "8.5%",
+          },
+        },
+        {
+          title: "Property Assessment Statistics",
+          href: "#",
+          metrics: {
+            "Assessed Properties": "84,600",
+            "Average Property Value": "₱2.9M",
+            "Highest Assessed Property": "₱180M",
+            "Newly Assessed Properties": "3,450",
+            "Assessment Completion Rate": "95%",
+          },
+        },
+      ],
+    },
+
+    {
+      department: "PAIMS (Procurement, Asset and Inventory Management System)",
+      reports: [
+        {
+          title: "Government Asset Inventory",
+          href: "#",
+          metrics: {
+            "Total Assets": "24,850",
+            "Available Assets": "92%",
+            "Assets Under Maintenance": "8%",
+            "Asset Utilization Rate": "88%",
+            "ICT Assets Recorded": "5,620",
+          },
+        },
+        {
+          title: "Procurement Cycle Monitoring",
+          href: "#",
+          metrics: {
+            "Completed Requests": "96%",
+            "Average Procurement Duration": "6 days",
+            "Longest Procurement Cycle": "24 days",
+            "Active Purchase Requests": "185",
+            "Procurement Savings": "₱12.5M",
+          },
+        },
+      ],
+    },
+
+    {
+      department: "AFIMS (Accounting and Finance Information Management System)",
+      reports: [
+        {
+          title: "City Revenue & Expenditure",
+          href: "#",
+          metrics: {
+            "Total Revenue": "₱3.25B",
+            "Total Expenditures": "₱2.91B",
+            "Net Surplus": "₱340M",
+            "Revenue Growth": "10.4%",
+            "Operating Margin": "10.5%",
+          },
+        },
+        {
+          title: "Budget Utilization",
+          href: "#",
+          metrics: {
+            "Average Budget Utilization": "86%",
+            "Lowest Utilization": "61%",
+            "Highest Utilization": "99%",
+            "Departments Within Budget": "92%",
+            "Remaining Budget": "₱450M",
+          },
+        },
+      ],
+    },
+
+    {
+      department: "HRIMS (Human Resource Information Management System)",
+      reports: [
+        {
+          title: "Workforce Statistics",
+          href: "#",
+          metrics: {
+            "Total Employees": "3,420",
+            "Active Employees": "97%",
+            "New Hires This Year": "285",
+            "Permanent Employees": "2,480",
+            "Contractual Employees": "940",
+          },
+        },
+        {
+          title: "Attendance & Workforce Productivity",
+          href: "#",
+          metrics: {
+            "Average Attendance Rate": "95%",
+            "Lowest Department Attendance": "81%",
+            "Highest Department Attendance": "100%",
+            "Average Leave Utilization": "7.2 days",
+            "Employee Satisfaction Rate": "91%",
+          },
+        },
+      ],
+    },
+  ];
+
   return (
-    <main className="relative h-full overflow-hidden bg-[#020617] text-white">
+    <main className="relative h-full min-h-0 overflow-hidden bg-[#020617] text-white">
       {/* MOBILE TOGGLE */}
       <button
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -293,14 +678,12 @@ export default function Dashboard() {
           lg:h-[calc(100dvh-20px)]
           h-screen
 
-          ${
-            mobileMenuOpen
-              ? "translate-x-0"
-              : "-translate-x-[120%] lg:translate-x-0"
+          ${mobileMenuOpen
+            ? "translate-x-0"
+            : "-translate-x-[120%] lg:translate-x-0"
           }
 
-          ${
-            mobileMenuOpen ? "w-screen" : sidebarOpen ? "w-[380px]" : "w-[78px]"
+          ${mobileMenuOpen ? "w-screen" : sidebarOpen ? "w-[380px]" : "w-[78px]"
           }
       `}
       >
@@ -485,7 +868,7 @@ export default function Dashboard() {
       <div className="relative z-10 mx-auto p-2 lg:pl-[90px] h-auto">
         <div className="grid h-full grid-cols-1 gap-2 xl:grid-cols-12">
           {/* LEFT + CENTER */}
-          <div className="flex h-full flex-col gap-2 xl:col-span-12">
+          <div className="flex flex-col gap-2 xl:col-span-12 min-h-screen lg:min-h-[98dvh]">
             {/* HEADER */}
             <div className="cyber-panel cyber-grid relative overflow-hidden rounded-xl p-6">
               {/* Background Image */}
@@ -560,7 +943,7 @@ export default function Dashboard() {
                 {/* BAR CHART */}
                 <div className="cyber-panel cyber-grid rounded-xl p-4">
                   <p className="mb-6 text-center text-sm text-cyan-100/80">
-                    Monthly Activity SSDMS
+                    Monthly Distribution Completion Rate (SSDMS)
                   </p>
 
                   <div className="space-y-3">
@@ -570,13 +953,29 @@ export default function Dashboard() {
                           {bar.month}
                         </span>
 
-                        <div className="h-4 flex-1 overflow-hidden rounded bg-[#0d1438]">
-                          <div
-                            className="h-full rounded bg-gradient-to-r from-cyan-400 to-blue-600"
-                            style={{
-                              width: `${bar.value * 10}%`,
-                            }}
-                          />
+                        <div className="relative h-5 flex-1 overflow-hidden rounded-md bg-[#0d1438] border border-cyan-500/10">
+                          {/* Progress Fill */}
+                          {bar.value > 0 && (
+                            <div
+                              className="flex h-full items-center justify-end rounded-md bg-gradient-to-r from-cyan-400 to-blue-600 pr-2 transition-all duration-700 ease-out"
+                              style={{
+                                width: `${bar.value}%`,
+                              }}
+                            >
+                              <span className="text-xs font-semibold text-white">
+                                {bar.value}%
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Upcoming Months */}
+                          {bar.value === 0 && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <span className="text-xs font-medium tracking-wide text-cyan-100/60">
+                                Upcoming
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -585,14 +984,14 @@ export default function Dashboard() {
               </div>
 
               {/* CENTER */}
-              <div className="order-2 xl:order-2 lg:order-3 flex flex-col gap-2 lg:col-span-12 xl:col-span-6 2xl:col-span-6 h-full">
-                {/* FUTURISTIC WORLD MAP */}
-                <div className="cyber-panel cyber-grid relative rounded-xl p-4">
-                  {/* TOP */}
+              <div className="order-2 xl:order-2 lg:order-3 flex flex-col gap-2 lg:col-span-12 xl:col-span-6 2xl:col-span-6 h-full lg:h-full 2xl:h-[83vh!important] min-h-0">
+                <div className="cyber-panel cyber-grid relative rounded-xl p-4 flex flex-col h-full min-h-0">
+
+                  {/* HEADER */}
                   <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     <div>
                       <h2 className="cyber-title text-xl font-bold md:text-2xl">
-                        Global Smart City Monitoring
+                        Smart City CCTV Monitoring
                       </h2>
 
                       <p className="text-sm text-cyan-200/70">
@@ -602,118 +1001,73 @@ export default function Dashboard() {
 
                     <div className="flex gap-2">
                       <div className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-xs text-cyan-300">
-                        Biñan Laguna Active
+                        Biñan Laguna
                       </div>
 
                       <div className="rounded-full border border-lime-400/30 bg-lime-500/10 px-4 py-2 text-xs text-lime-300">
-                        Online
+                        {cctvLocations.length} CCTV Online
                       </div>
                     </div>
                   </div>
 
                   {/* MAP */}
-                  <div className="relative flex-1 overflow-hidden rounded-xl border border-cyan-400/20 bg-[#050816] min-h-0 xl:h-[calc(87dvh-64px)] 2xl:h-[calc(79dvh-64px)] 3xl:h-[calc(61dvh-64px)]">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(14,165,233,0.08),transparent_70%)]" />
+                  <div className="relative flex-1 overflow-hidden rounded-xl border border-cyan-400/20 bg-[#050816]">
 
-                    <TransformWrapper
-                      initialScale={1.7}
-                      minScale={1}
-                      maxScale={8}
-                      wheel={{ disabled: true }}
-                      pinch={{ disabled: true }}
-                      doubleClick={{ disabled: true }}
-                      panning={{ disabled: true }}
+                    <MapContainer
+                      center={[14.3386, 121.0889]}
+                      zoom={13}
+                      scrollWheelZoom={true}
+                      className="h-[500px] xl:h-full w-full z-0"
                     >
-                      {({ zoomIn, zoomOut, resetTransform }) => (
-                        <>
-                          {/* CONTROLS */}
-                          <div className="absolute right-4 top-4 z-50 flex flex-col gap-2">
-                            <button
-                              onClick={() => zoomIn()}
-                              className="h-10 w-10 rounded-lg border border-cyan-400/30 bg-[#081121]/80 text-cyan-300 backdrop-blur hover:bg-cyan-500/20"
-                            >
-                              +
-                            </button>
+                      <TileLayer
+                        attribution='&copy; OpenStreetMap contributors'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      />
 
-                            <button
-                              onClick={() => zoomOut()}
-                              className="h-10 w-10 rounded-lg border border-cyan-400/30 bg-[#081121]/80 text-cyan-300 backdrop-blur hover:bg-cyan-500/20"
-                            >
-                              −
-                            </button>
+                      {cctvLocations.map((camera) => (
+                        <Marker
+                          key={camera.id}
+                          position={camera.position as [number, number]}
+                          icon={createCctvIcon(camera.name)}
+                        >
+                          <Popup>
+                            <div className="space-y-2 min-w-[180px]">
+                              <h3 className="font-semibold">
+                                {camera.name}
+                              </h3>
 
-                            <button
-                              onClick={() => resetTransform()}
-                              className="rounded-lg border border-cyan-400/30 bg-[#081121]/80 px-3 py-2 text-xs text-cyan-300 backdrop-blur hover:bg-cyan-500/20"
-                            >
-                              RESET
-                            </button>
-                          </div>
-
-                          <TransformComponent
-                            wrapperClass="!w-full !h-full"
-                            contentClass="!w-full !h-full"
-                          >
-                            <ComposableMap
-                              projection="geoMercator"
-                              className="h-full w-full"
-                              projectionConfig={{
-                                scale: 160,
-                                center: [121.08, 14.33],
-                              }}
-                            >
-                              <Geographies geography="https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json">
-                                {({ geographies }: { geographies: any[] }) =>
-                                  geographies.map((geo: any) => (
-                                    <Geography
-                                      key={geo.rsmKey}
-                                      geography={geo}
-                                      fill="#0f2d52"
-                                      stroke="#38bdf8"
-                                      strokeWidth={0.4}
-                                      style={{
-                                        default: {
-                                          outline: "none",
-                                        },
-                                        hover: {
-                                          fill: "#1d4ed8",
-                                          outline: "none",
-                                        },
-                                        pressed: {
-                                          outline: "none",
-                                        },
-                                      }}
-                                    />
-                                  ))
+                              <button
+                                onClick={() =>
+                                  window.open(
+                                    camera.url,
+                                    "_blank",
+                                    "noopener,noreferrer"
+                                  )
                                 }
-                              </Geographies>
+                                className="rounded bg-cyan-600 px-3 py-1 text-white text-sm"
+                              >
+                                View Live CCTV Footage
+                              </button>
+                            </div>
+                          </Popup>
+                        </Marker>
+                      ))}
+                    </MapContainer>
 
-                              {/* PIN */}
-                              <Marker coordinates={[121.08, 14.33]}>
-                                <g className="pin-pulse">
-                                  <circle
-                                    r={8}
-                                    fill="#06b6d4"
-                                    stroke="#67e8f9"
-                                    strokeWidth={2}
-                                  />
+                    {/* OVERLAY */}
+                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(14,165,233,0.08),transparent_70%)]" />
 
-                                  <circle r={18} fill="rgba(34,211,238,.15)" />
+                    {/* LEGEND */}
+                    <div className="absolute bottom-4 left-4 z-[1000] rounded-lg border border-cyan-400/30 bg-[#081121]/90 px-4 py-3 backdrop-blur">
+                      <div className="mb-2 text-xs font-semibold text-cyan-300">
+                        CCTV STATUS
+                      </div>
 
-                                  <text
-                                    textAnchor="middle"
-                                    y={-18}
-                                    className="fill-cyan-200 text-[12px] font-bold"
-                                  >
-                                    Biñan Laguna
-                                  </text>
-                                </g>
-                              </Marker>
-                            </ComposableMap>
-                          </TransformComponent>
-                        </>
-                      )}
-                    </TransformWrapper>
+                      <div className="flex items-center gap-2 text-xs text-white">
+                        <span className="h-3 w-3 rounded-full bg-red-500" />
+                        Active Camera
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -888,10 +1242,15 @@ export default function Dashboard() {
                   <p className="mb-6 text-center text-sm text-cyan-100/80">
                     Mayor's Weekly Briefer
                   </p>
-                  <button className="my-3 rounded-lg bg-cyan-500/10 px-4 py-2 text-cyan-100 hover:bg-cyan-500/20 block mx-auto">
+
+                  <button
+                    onClick={() => setOpenWeeklyBriefer(true)}
+                    className="my-3 rounded-lg bg-cyan-500/10 px-4 py-2 text-cyan-100 hover:bg-cyan-500/20 block mx-auto"
+                  >
                     View Weekly Briefer
                   </button>
                 </div>
+
               </div>
             </div>
           </div>
@@ -940,6 +1299,106 @@ export default function Dashboard() {
                     </a>
                   )
                 )} */}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Weekly Briefer MODAL */}
+      {openWeeklyBriefer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+          <div className="cyber-panel cyber-grid w-full max-w-2xl rounded-3xl p-8 shadow-2xl">
+
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-cyan-500/20 p-6">
+              <div>
+                <h2 className="text-3xl font-bold text-cyan-100">
+                  Mayor's Weekly Briefer
+                </h2>
+                <p className="text-cyan-300/70">
+                  Available Links & Resources
+                </p>
+              </div>
+
+              <button
+                onClick={() => setOpenWeeklyBriefer(false)}
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-cyan-500/10 text-2xl text-cyan-100 hover:bg-cyan-500/20"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="max-h-[75vh] overflow-y-auto p-6 space-y-6">
+
+              {weeklyBrieferData.map((department) => (
+                <div
+                  key={department.department}
+                  className="rounded-xl border border-cyan-500/20 bg-cyan-950/10 p-4"
+                >
+                  <h3 className="mb-4 text-lg font-semibold text-cyan-300">
+                    {department.department}
+                  </h3>
+
+                  <div className="space-y-3">
+                    {department.reports.map((report) => {
+                      const key = `${department.department}-${report.title}`;
+
+                      return (
+                        <div
+                          key={key}
+                          className="rounded-lg border border-cyan-500/10"
+                        >
+                          <button
+                            onClick={() =>
+                              setOpenAccordion(
+                                openAccordion === key ? null : key
+                              )
+                            }
+                            className="flex w-full items-center justify-between p-4 text-left"
+                          >
+                            <a
+                              href={report.href}
+                              target="_blank"
+                              className="font-medium text-cyan-200 underline"
+                            >
+                              {report.title}
+                            </a>
+
+                            <span>
+                              {openAccordion === key ? "−" : "+"}
+                            </span>
+                          </button>
+
+                          {openAccordion === key && (
+                            <div className="border-t border-cyan-500/10 p-4">
+                              <ul className="space-y-2">
+                                {Object.entries(report.metrics).map(
+                                  ([metric, value]) => (
+                                    <li
+                                      key={metric}
+                                      className="flex justify-between text-sm"
+                                    >
+                                      <span className="text-cyan-100/80">
+                                        {metric}
+                                      </span>
+
+                                      <span className="font-medium text-cyan-300">
+                                        {value}
+                                      </span>
+                                    </li>
+                                  )
+                                )}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+
             </div>
           </div>
         </div>
