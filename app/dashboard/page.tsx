@@ -304,7 +304,7 @@ export default function Dashboard() {
     {
       id: 1,
       name: "Biñan (Poblacion)",
-      position: [14.3386, 121.0889],
+      position: [4.3373, 121.0827],
       illnesses: [
         { name: "Dengue", infected: 46 },
         { name: "Influenza", infected: 23 },
@@ -315,7 +315,7 @@ export default function Dashboard() {
     {
       id: 2,
       name: "Bungahan",
-      position: [14.3500, 121.0970],
+      position: [14.3024, 121.0733],
       illnesses: [
         { name: "Dengue", infected: 32 },
         { name: "Influenza", infected: 18 },
@@ -326,7 +326,7 @@ export default function Dashboard() {
     {
       id: 3,
       name: "Canlalay",
-      position: [14.3165, 121.0845],
+      position: [14.3421, 121.0719],
       illnesses: [
         { name: "Dengue", infected: 29 },
         { name: "Diabetes", infected: 20 },
@@ -337,7 +337,7 @@ export default function Dashboard() {
     {
       id: 4,
       name: "Casile",
-      position: [14.255, 121.145],
+      position: [14.3434, 121.0886],
       illnesses: [
         { name: "Dengue", infected: 11 },
         { name: "Influenza", infected: 8 },
@@ -348,7 +348,7 @@ export default function Dashboard() {
     {
       id: 5,
       name: "De La Paz",
-      position: [14.342, 121.074],
+      position: [14.3487, 121.0848],
       illnesses: [
         { name: "Dengue", infected: 37 },
         { name: "Diabetes", infected: 16 },
@@ -359,7 +359,7 @@ export default function Dashboard() {
     {
       id: 6,
       name: "Ganado",
-      position: [14.318, 121.066],
+      position: [14.2848, 121.0804],
       illnesses: [
         { name: "Dengue", infected: 18 },
         { name: "Influenza", infected: 14 },
@@ -370,7 +370,7 @@ export default function Dashboard() {
     {
       id: 7,
       name: "Langkiwa",
-      position: [14.322, 121.105],
+      position: [14.2997, 121.0592],
       illnesses: [
         { name: "Dengue", infected: 21 },
         { name: "Diabetes", infected: 11 },
@@ -381,7 +381,7 @@ export default function Dashboard() {
     {
       id: 8,
       name: "Loma",
-      position: [14.304, 121.089],
+      position: [14.2874, 121.0662],
       illnesses: [
         { name: "Dengue", infected: 25 },
         { name: "Influenza", infected: 19 },
@@ -392,7 +392,7 @@ export default function Dashboard() {
     {
       id: 9,
       name: "Malaban",
-      position: [14.292, 121.067],
+      position: [14.3464, 121.0889],
       illnesses: [
         { name: "Dengue", infected: 27 },
         { name: "Diabetes", infected: 12 },
@@ -403,7 +403,7 @@ export default function Dashboard() {
     {
       id: 10,
       name: "Malamig",
-      position: [14.315, 121.072],
+      position: [14.2780, 121.0532],
       illnesses: [
         { name: "Dengue", infected: 20 },
         { name: "Influenza", infected: 15 },
@@ -414,7 +414,7 @@ export default function Dashboard() {
     {
       id: 11,
       name: "Mampalasan",
-      position: [14.279, 121.052],
+      position: [14.2916, 121.0784],
       illnesses: [
         { name: "Dengue", infected: 34 },
         { name: "Diabetes", infected: 15 },
@@ -425,7 +425,7 @@ export default function Dashboard() {
     {
       id: 12,
       name: "Platero",
-      position: [14.299, 121.089],
+      position: [14.3210, 121.0921],
       illnesses: [
         { name: "Dengue", infected: 41 },
         { name: "Influenza", infected: 20 },
@@ -436,7 +436,7 @@ export default function Dashboard() {
     {
       id: 13,
       name: "Poblacion",
-      position: [14.3418, 121.0912],
+      position: [14.3389, 121.0839],
       illnesses: [
         { name: "Dengue", infected: 49 },
         { name: "Influenza", infected: 31 },
@@ -447,7 +447,7 @@ export default function Dashboard() {
     {
       id: 14,
       name: "San Antonio",
-      position: [14.286, 121.078],
+      position: [14.3362, 121.0883],
       illnesses: [
         { name: "Dengue", infected: 28 },
         { name: "Diabetes", infected: 17 },
@@ -458,7 +458,7 @@ export default function Dashboard() {
     {
       id: 15,
       name: "San Francisco (Halang)",
-      position: [14.309, 121.061],
+      position: [14.3333, 121.0561],
       illnesses: [
         { name: "Dengue", infected: 44 },
         { name: "Influenza", infected: 22 },
@@ -469,7 +469,7 @@ export default function Dashboard() {
     {
       id: 16,
       name: "San Jose",
-      position: [14.327, 121.076],
+      position: [14.3436, 121.0824],
       illnesses: [
         { name: "Dengue", infected: 30 },
         { name: "Diabetes", infected: 13 },
@@ -480,7 +480,7 @@ export default function Dashboard() {
     {
       id: 17,
       name: "San Vicente",
-      position: [14.334, 121.082],
+      position: [14.3312, 121.0798],
       illnesses: [
         { name: "Dengue", infected: 33 },
         { name: "Influenza", infected: 24 },
@@ -491,7 +491,7 @@ export default function Dashboard() {
     {
       id: 18,
       name: "Santo Domingo",
-      position: [14.346, 121.067],
+      position: [14.3359, 121.0820],
       illnesses: [
         { name: "Dengue", infected: 26 },
         { name: "Diabetes", infected: 14 },
@@ -502,7 +502,7 @@ export default function Dashboard() {
     {
       id: 19,
       name: "Santo Niño",
-      position: [14.352, 121.082],
+      position: [14.3305, 121.0858],
       illnesses: [
         { name: "Dengue", infected: 35 },
         { name: "Influenza", infected: 21 },
@@ -513,7 +513,7 @@ export default function Dashboard() {
     {
       id: 20,
       name: "Santo Tomas",
-      position: [14.266, 121.126],
+      position: [14.3112, 121.0638],
       illnesses: [
         { name: "Dengue", infected: 16 },
         { name: "Influenza", infected: 12 },
@@ -524,7 +524,7 @@ export default function Dashboard() {
     {
       id: 21,
       name: "Soro-Soro",
-      position: [14.288, 121.103],
+      position: [14.3255, 121.0615],
       illnesses: [
         { name: "Dengue", infected: 24 },
         { name: "Diabetes", infected: 10 },
@@ -535,7 +535,7 @@ export default function Dashboard() {
     {
       id: 22,
       name: "Timbao",
-      position: [14.277, 121.071],
+      position: [14.2825, 121.0547],
       illnesses: [
         { name: "Dengue", infected: 39 },
         { name: "Influenza", infected: 27 },
@@ -546,7 +546,7 @@ export default function Dashboard() {
     {
       id: 23,
       name: "Tubigan",
-      position: [14.321, 121.094],
+      position: [14.3298, 121.0700],
       illnesses: [
         { name: "Dengue", infected: 22 },
         { name: "Diabetes", infected: 9 },
@@ -557,7 +557,7 @@ export default function Dashboard() {
     {
       id: 24,
       name: "Zapote",
-      position: [14.307, 121.099],
+      position: [14.3175, 121.0813],
       illnesses: [
         { name: "Dengue", infected: 36 },
         { name: "Influenza", infected: 25 },
