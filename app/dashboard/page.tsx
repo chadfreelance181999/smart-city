@@ -4,9 +4,9 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Bell, Menu } from "lucide-react";
 import { signOut } from "next-auth/react";
-
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { DepartmentsModel } from "../generated/prisma/models";
+
+type LatLngTuple = [number, number];
 
 const Globe = dynamic(() => import("react-globe.gl"), {
   ssr: false,
@@ -21,6 +21,7 @@ interface DepartmentsModelWithCount extends DepartmentsModel {
 export default function Dashboard() {
   const [selectedModule, setSelectedModule] = useState<any>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const center: LatLngTuple = [14.3386, 121.0889];
   const [leaflet, setLeaflet] = useState<any>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openWeeklyBriefer, setOpenWeeklyBriefer] = useState(false);
@@ -981,6 +982,7 @@ export default function Dashboard() {
                     ))}
                   </div>
                 </div>
+
               </div>
 
               {/* CENTER */}
@@ -1014,7 +1016,7 @@ export default function Dashboard() {
                   <div className="relative flex-1 overflow-hidden rounded-xl border border-cyan-400/20 bg-[#050816]">
 
                     <MapContainer
-                      center={[14.3386, 121.0889]}
+                      center={center}
                       zoom={13}
                       scrollWheelZoom={true}
                       className="h-[500px] xl:h-full w-full z-0"
