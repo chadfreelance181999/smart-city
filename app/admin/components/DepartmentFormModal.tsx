@@ -20,12 +20,12 @@ export default function DepartmentFormModal({
   isLoading = false,
 }: DepartmentFormModalProps) {
   const defaultFormData: Partial<DepartmentsModel> = useMemo(() => ({
-      title: '',
-      link: '',
-      subTitle: '',
-      description: '',
-      color: '',
-      icon: '',
+    title: '',
+    link: '',
+    subTitle: '',
+    description: '',
+    color: '',
+    icon: '',
   }), [])
 
   const isEditMode = !!initialData
@@ -57,7 +57,7 @@ export default function DepartmentFormModal({
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-500 hover:text-white"
           >
             <X size={24} />
           </button>
@@ -67,7 +67,7 @@ export default function DepartmentFormModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white mb-1">
               Title
             </label>
             <input
@@ -80,10 +80,10 @@ export default function DepartmentFormModal({
               placeholder="Enter department title"
             />
           </div>
-          
+
           {/* Subtitle */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white mb-1">
               Subtitle
             </label>
             <input
@@ -98,7 +98,7 @@ export default function DepartmentFormModal({
 
           {/* Link */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white mb-1">
               Link
             </label>
             <input
@@ -114,7 +114,7 @@ export default function DepartmentFormModal({
 
           {/* Icon */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white mb-1">
               Icon
             </label>
             <input
@@ -127,9 +127,9 @@ export default function DepartmentFormModal({
             />
           </div>
 
-           {/* Color */}
+          {/* Color */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white mb-1">
               Color
             </label>
             <input
@@ -144,7 +144,7 @@ export default function DepartmentFormModal({
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white mb-1">
               Description
             </label>
             <input
@@ -162,7 +162,7 @@ export default function DepartmentFormModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 text-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900"
             >
               Cancel
             </button>

@@ -49,7 +49,7 @@ export default function UserFormModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-[#1b0f5c] bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-gradient-to-br from-[#12093b] via-[#1b0f5c] to-[#2d1b75] rounded-lg shadow-lg w-full max-w-md">
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b">
@@ -58,7 +58,7 @@ export default function UserFormModal({
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-500 hover:text-white"
           >
             <X size={24} />
           </button>
@@ -68,7 +68,7 @@ export default function UserFormModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white mb-1">
               Name
             </label>
             <input
@@ -84,7 +84,7 @@ export default function UserFormModal({
 
           {/* Middle Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white mb-1">
               Middle Name
             </label>
             <input
@@ -99,7 +99,7 @@ export default function UserFormModal({
 
           {/* Last Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white mb-1">
               Last Name
             </label>
             <input
@@ -115,7 +115,7 @@ export default function UserFormModal({
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white mb-1">
               Email
             </label>
             <input
@@ -131,7 +131,7 @@ export default function UserFormModal({
 
           {/* User type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white mb-1">
               User type
             </label>
             <select
@@ -152,7 +152,7 @@ export default function UserFormModal({
           )}
           {/* Password */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white mb-1">
               Password
             </label>
             <input
@@ -172,7 +172,7 @@ export default function UserFormModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 text-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900"
             >
               Cancel
             </button>

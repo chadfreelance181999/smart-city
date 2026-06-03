@@ -951,7 +951,7 @@ export default function Dashboard() {
                     </div>
 
                     {/* MAP SELECTOR */}
-                    <details className="rounded-lg border border-cyan-400/20 bg-[#081121]/80">
+                    <details className="rounded-lg border border-cyan-400/20 bg-[#081121]/80 lg:w-[40%] w-full">
                       <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-cyan-300">
                         Select Monitoring System
                       </summary>
