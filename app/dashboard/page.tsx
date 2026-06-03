@@ -10,6 +10,8 @@ import {
   ReportMetricsModel,
 } from "../generated/prisma/models";
 import moment from "moment";
+import { PDFViewer } from "@react-pdf/renderer";
+import DocumentPreview from "./components/DocumentPreview";
 
 const Globe = dynamic(() => import("react-globe.gl"), {
   ssr: false,
@@ -51,12 +53,12 @@ export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openWeeklyBriefer, setOpenWeeklyBriefer] = useState(false);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
-  const [departments, setDepartments] = useState<DepartmentsWithReports[]>(
-    [],
-  );
+  const [departments, setDepartments] = useState<DepartmentsWithReports[]>([]);
   const [weeklyReports, setWeeklyReports] = useState<DepartmentsWithReports[]>(
     [],
   );
+
+  const [showPdfViewer, setShowPdfViewer] = useState(false);
 
   const [weeklyReportsFetched, setWeeklyReportsFetched] = useState(false);
 
@@ -149,7 +151,6 @@ export default function Dashboard() {
     loadLeaflet();
   }, []);
 
-
   const bars = [
     { month: "Dec", value: 0 },
     { month: "Nov", value: 0 },
@@ -164,7 +165,6 @@ export default function Dashboard() {
     { month: "Feb", value: 100 },
     { month: "Jan", value: 100 },
   ];
-
 
   const totalLinks = departments.reduce(
     (sum, department) => sum + department.reports.length,
@@ -403,7 +403,7 @@ export default function Dashboard() {
     {
       id: 10,
       name: "Malamig",
-      position: [14.2780, 121.0532],
+      position: [14.278, 121.0532],
       illnesses: [
         { name: "Dengue", infected: 20 },
         { name: "Influenza", infected: 15 },
@@ -425,7 +425,7 @@ export default function Dashboard() {
     {
       id: 12,
       name: "Platero",
-      position: [14.3210, 121.0921],
+      position: [14.321, 121.0921],
       illnesses: [
         { name: "Dengue", infected: 41 },
         { name: "Influenza", infected: 20 },
@@ -491,7 +491,7 @@ export default function Dashboard() {
     {
       id: 18,
       name: "Santo Domingo",
-      position: [14.3359, 121.0820],
+      position: [14.3359, 121.082],
       illnesses: [
         { name: "Dengue", infected: 26 },
         { name: "Diabetes", infected: 14 },
@@ -546,7 +546,7 @@ export default function Dashboard() {
     {
       id: 23,
       name: "Tubigan",
-      position: [14.3298, 121.0700],
+      position: [14.3298, 121.07],
       illnesses: [
         { name: "Dengue", infected: 22 },
         { name: "Diabetes", infected: 9 },
@@ -605,12 +605,14 @@ export default function Dashboard() {
           lg:h-[calc(100dvh-20px)]
           h-screen
 
-          ${mobileMenuOpen
-            ? "translate-x-0"
-            : "-translate-x-[120%] lg:translate-x-0"
+          ${
+            mobileMenuOpen
+              ? "translate-x-0"
+              : "-translate-x-[120%] lg:translate-x-0"
           }
 
-          ${mobileMenuOpen ? "w-screen" : sidebarOpen ? "w-[380px]" : "w-[78px]"
+          ${
+            mobileMenuOpen ? "w-screen" : sidebarOpen ? "w-[380px]" : "w-[78px]"
           }
       `}
       >
@@ -938,10 +940,11 @@ export default function Dashboard() {
                         </div>
 
                         <div
-                          className={`rounded-full px-4 py-2 text-xs ${activeMap === "cctv"
-                            ? "border border-lime-400/30 bg-lime-500/10 text-lime-300"
-                            : "border border-red-400/30 bg-red-500/10 text-red-300"
-                            }`}
+                          className={`rounded-full px-4 py-2 text-xs ${
+                            activeMap === "cctv"
+                              ? "border border-lime-400/30 bg-lime-500/10 text-lime-300"
+                              : "border border-red-400/30 bg-red-500/10 text-red-300"
+                          }`}
                         >
                           {activeMap === "cctv"
                             ? `${cctvLocations.length} CCTV Online`
@@ -959,20 +962,22 @@ export default function Dashboard() {
                       <div className="flex flex-col gap-2 p-3">
                         <button
                           onClick={() => setActiveMap("cctv")}
-                          className={`rounded-lg px-4 py-2 text-left text-sm transition ${activeMap === "cctv"
-                            ? "bg-cyan-600 text-white"
-                            : "bg-slate-800 text-slate-300 hover:bg-slate-700"
-                            }`}
+                          className={`rounded-lg px-4 py-2 text-left text-sm transition ${
+                            activeMap === "cctv"
+                              ? "bg-cyan-600 text-white"
+                              : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                          }`}
                         >
                           📹 Smart City CCTV Monitoring
                         </button>
 
                         <button
                           onClick={() => setActiveMap("hims")}
-                          className={`rounded-lg px-4 py-2 text-left text-sm transition ${activeMap === "hims"
-                            ? "bg-red-600 text-white"
-                            : "bg-slate-800 text-slate-300 hover:bg-slate-700"
-                            }`}
+                          className={`rounded-lg px-4 py-2 text-left text-sm transition ${
+                            activeMap === "hims"
+                              ? "bg-red-600 text-white"
+                              : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                          }`}
                         >
                           🏥 Health Information Management System
                         </button>
@@ -1320,7 +1325,7 @@ export default function Dashboard() {
               {selectedModule.reports.map((report) => (
                 <a
                   key={"department-report" + report.id}
-                  href={report.url || '#'}
+                  href={report.url || "#"}
                   target="_blank"
                   className="flex items-center justify-between rounded-2xl border border-cyan-400/20 bg-cyan-500/5 px-5 py-4 transition hover:bg-cyan-500/10"
                 >
@@ -1347,7 +1352,12 @@ export default function Dashboard() {
                   Mayor's Weekly Briefer
                 </h2>
                 <p className="text-cyan-300/70">Available Links & Resources</p>
-                <p className="text-cyan-300/70">{moment().isoWeekday(1).format("MMMM DD, YYYY")} - {moment().isoWeekday(5).endOf('day').format("MMMM DD, YYYY")}</p>
+                <p className="text-cyan-300/70">
+                  {moment().isoWeekday(1).format("MMMM DD, YYYY")} -{" "}
+                  {moment().isoWeekday(5).endOf("day").format("MMMM DD, YYYY")}
+                </p>
+
+               
               </div>
 
               <button
@@ -1357,6 +1367,13 @@ export default function Dashboard() {
                 ×
               </button>
             </div>
+
+             <button
+                  onClick={() => setShowPdfViewer(true)}
+                  className="block mx-auto mt-4 rounded-lg bg-cyan-500/10 px-4 py-2 text-cyan-100 hover:bg-cyan-500/20"
+                >
+                  View PDF Preview
+                </button>
 
             {/* Content */}
             <div className="max-h-[75vh] overflow-y-auto p-6 space-y-6">
@@ -1423,6 +1440,34 @@ export default function Dashboard() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PDF Viewer Modal */}
+      {showPdfViewer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+          <div className="cyber-panel cyber-grid w-full max-w-3xl rounded-3xl p-8 shadow-2xl">
+            <div className="mb-6 flex items-start justify-between gap-6">
+              <div className="w-[90%]">
+                <h2 className="text-2xl font-bold text-cyan-100 md:text-3xl">
+                  Mayor's Weekly Briefer - Preview
+                </h2>
+              </div>
+
+              <button
+                onClick={() => setShowPdfViewer(false)}
+                className="h-10 w-10 rounded-full bg-cyan-500/10 transition hover:bg-red-500"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="h-[70vh]">
+              <PDFViewer width="100%" height="100%">
+                <DocumentPreview departments={weeklyReports} />
+              </PDFViewer>
             </div>
           </div>
         </div>
