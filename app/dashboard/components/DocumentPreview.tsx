@@ -17,7 +17,6 @@ interface DepartmentsWithReports extends DepartmentsModel {
 const styles = StyleSheet.create({
   page: {
     flexDirection: "column",
-    backgroundColor: "#E4E4E4",
     padding: 30,
   },
   headings: {
@@ -48,10 +47,9 @@ const DocumentPreview = ({
     <Page size="A4" style={styles.page} wrap>
       <View style={styles.section}>
         <Image
-          src="https://smart-city-staging.netlify.app/Binan%20Laguna.jpg"
-          style={{ width: 50, height: 50, marginBottom: 10, position: "absolute", left: 50, top: 50, zIndex: 1000 }}
+          src="/city-of-binan-logo.jpg"
+          style={{ width: 100, height: 100, marginBottom: 10, position: "absolute", top: -10, left: -10, zIndex: 1000 }}
           minPresenceAhead={1000}
-          alt="City of Biñan Logo"
         />
         <Text style={styles.headings}>Republic of the Philippines</Text>
         <Text style={styles.headings}>Province of Laguna</Text>

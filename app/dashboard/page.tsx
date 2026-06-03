@@ -940,11 +940,7 @@ export default function Dashboard() {
                         </div>
 
                         <div
-                          className={`rounded-full px-4 py-2 text-xs ${
-                            activeMap === "cctv"
-                              ? "border border-lime-400/30 bg-lime-500/10 text-lime-300"
-                              : "border border-red-400/30 bg-red-500/10 text-red-300"
-                          }`}
+                          className={`rounded-full px-4 py-2 text-xs border border-lime-400/30 bg-lime-500/10 text-lime-300"`}
                         >
                           {activeMap === "cctv"
                             ? `${cctvLocations.length} CCTV Online`
@@ -954,7 +950,7 @@ export default function Dashboard() {
                     </div>
 
                     {/* MAP SELECTOR */}
-                    <details className="rounded-lg border border-cyan-400/20 bg-[#081121]/80 lg:w-[40%] w-full">
+                    <details className="rounded-lg border border-cyan-400/20 bg-[#081121]/80 lg:w-[50%] w-full">
                       <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-cyan-300">
                         Select Monitoring System
                       </summary>
@@ -975,7 +971,7 @@ export default function Dashboard() {
                           onClick={() => setActiveMap("hims")}
                           className={`rounded-lg px-4 py-2 text-left text-sm transition ${
                             activeMap === "hims"
-                              ? "bg-red-600 text-white"
+                              ? "bg-cyan-600 text-white"
                               : "bg-slate-800 text-slate-300 hover:bg-slate-700"
                           }`}
                         >
@@ -1084,12 +1080,12 @@ export default function Dashboard() {
 
                       {activeMap === "cctv" ? (
                         <div className="flex items-center gap-2 text-xs text-white">
-                          <span className="h-3 w-3 rounded-full bg-red-500" />
+                          <span className="h-3 w-3 rounded-full bg-lime-500" />
                           Active Camera
                         </div>
                       ) : (
                         <div className="flex items-center gap-2 text-xs text-white">
-                          <span className="h-3 w-3 rounded-full bg-red-500" />
+                          <span className="h-3 w-3 rounded-full bg-lime-500" />
                           Barangay Health Data
                         </div>
                       )}
