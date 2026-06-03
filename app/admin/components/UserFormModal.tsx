@@ -49,7 +49,7 @@ export default function UserFormModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-[#1b0f5c] bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-gradient-to-br from-[#12093b] via-[#1b0f5c] to-[#2d1b75] rounded-lg shadow-lg w-full max-w-md">
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b">
@@ -140,9 +140,9 @@ export default function UserFormModal({
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="ADMIN">Admin</option>
-              <option value="ENCODER">Encoder</option>
-              <option value="USER">User</option>
+              <option className="text-black" value="ADMIN">Admin</option>
+              <option className="text-black" value="ENCODER">Encoder</option>
+              <option className="text-black" value="USER">User</option>
             </select>
           </div>
 
